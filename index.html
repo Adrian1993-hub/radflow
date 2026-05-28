@@ -1,0 +1,1186 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="RadFlow">
+<meta name="theme-color" content="#0d2e41">
+<title>RadFlow Guard · Organizador de solicitudes radiológicas</title>
+<style>
+:root{
+  --navy:#0d2e41; --teal:#1a6b7a; --teal-light:#4a8a99;
+  --bg:#f4f6f8; --paper:#ffffff; --ink:#16242e; --ink-soft:#5a6b76;
+  --line:#dce4e9; --gold:#c79a3a;
+  --green:#1f9d55; --green-bg:#e3f6ec;
+  --yellow:#c79a00; --yellow-bg:#fbf3d6;
+  --orange:#d97706; --orange-bg:#fdecd8;
+  --red:#c0392b; --red-bg:#fbe3e0;
+  --black:#2c3e50; --black-bg:#dfe4e8;
+  --shadow:0 8px 22px rgba(13,46,65,.08);
+  --radius:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html{scroll-behavior:smooth}
+body{
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  background:var(--bg); color:var(--ink); line-height:1.5; font-size:15px;
+  padding-bottom:90px; -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:760px;margin:0 auto;padding:0 14px}
+
+/* HEADER */
+header{
+  background:linear-gradient(135deg,var(--navy),var(--teal));
+  color:#fff;padding:calc(env(safe-area-inset-top) + 18px) 0 20px;
+}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.brand h1{font-size:1.25rem;font-weight:800;letter-spacing:-.01em}
+.brand p{font-size:.74rem;color:#cfe6e6;margin-top:2px;font-weight:500}
+.metrics{display:flex;gap:8px;flex-wrap:wrap}
+.metric{background:rgba(255,255,255,.12);border-radius:12px;padding:7px 11px;text-align:center;min-width:62px}
+.metric b{display:block;font-size:1.05rem;font-weight:800}
+.metric span{font-size:.68rem;color:#d6ece9}
+
+/* TABS (Reporte / Config) */
+.tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:16px 0;position:sticky;top:0;z-index:30;padding:8px 0;background:rgba(244,246,248,.86);backdrop-filter:blur(10px)}
+.tab{border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:14px;padding:14px;font-weight:800;font-size:.95rem;cursor:pointer;transition:all .15s;box-shadow:var(--shadow)}
+.tab.active{background:linear-gradient(135deg,var(--navy),var(--teal));color:#fff;border-color:transparent}
+.view{display:none}
+.view.active{display:block;animation:fade .25s}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+/* MODE BUTTONS (Caso / Turno) */
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:14px}
+.modeBtn{border:1px solid var(--line);background:#fff;color:var(--ink-soft);border-radius:12px;padding:11px;font-weight:700;font-size:.88rem;cursor:pointer}
+.modeBtn.active{background:var(--navy);color:#fff;border-color:transparent}
+.reportMode{display:none}
+.reportMode.active{display:block}
+
+/* CARDS */
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--radius);padding:16px;margin-bottom:14px;box-shadow:var(--shadow)}
+.card h3{font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;color:var(--teal);font-weight:800;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h3 .step{background:var(--teal);color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;flex-shrink:0}
+
+/* FLOW STEPPER */
+.flow{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;font-size:.7rem}
+.flow span{background:#fff;border:1px solid var(--line);border-radius:20px;padding:5px 10px;color:var(--ink-soft);font-weight:600}
+.flow span.on{background:var(--teal);color:#fff;border-color:transparent}
+
+/* FORM */
+label{display:block;font-size:.76rem;font-weight:700;color:var(--ink-soft);margin:10px 0 4px}
+label.req::after{content:" *";color:var(--red)}
+input,select,textarea{
+  width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;
+  font-size:16px;font-family:inherit;background:#fff;color:var(--ink);transition:border .15s;
+}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--teal)}
+textarea{resize:vertical;min-height:70px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.grid3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+@media(max-width:520px){.grid3{grid-template-columns:1fr 1fr}}
+
+/* BUTTONS */
+button{cursor:pointer;font-family:inherit}
+.btn{background:var(--teal);color:#fff;border:none;border-radius:11px;padding:13px 16px;font-weight:800;font-size:.92rem;width:100%;transition:filter .15s}
+.btn:active{filter:brightness(.92)}
+.btn.navy{background:var(--navy)}
+.btn.gold{background:var(--gold)}
+.btn.ghost{background:#fff;color:var(--navy);border:1px solid var(--line)}
+.btn.green{background:var(--green)}
+.btn-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.btn-row.three{grid-template-columns:1fr 1fr 1fr}
+@media(max-width:520px){.btn-row.three{grid-template-columns:1fr}}
+.ib{background:#eef3f5;border:1px solid var(--line);color:var(--navy);border-radius:8px;padding:6px 10px;font-size:.76rem;font-weight:700}
+.ib.d{background:var(--red-bg);color:var(--red);border-color:#f1c9c4}
+
+/* STATUS PANEL */
+.status-panel{border-radius:var(--radius);padding:16px;margin-bottom:14px;border:2px solid}
+.status-panel.s-green{background:var(--green-bg);border-color:var(--green)}
+.status-panel.s-yellow{background:var(--yellow-bg);border-color:var(--yellow)}
+.status-panel.s-orange{background:var(--orange-bg);border-color:var(--orange)}
+.status-panel.s-red{background:var(--red-bg);border-color:var(--red)}
+.status-panel.s-black{background:var(--black-bg);border-color:var(--black)}
+.status-head{font-size:1.05rem;font-weight:900;display:flex;align-items:center;gap:8px;margin-bottom:4px}
+.status-sub{font-size:.82rem;color:var(--ink-soft);font-weight:600}
+.alerts{margin-top:12px;display:flex;flex-direction:column;gap:7px}
+.alert-item{background:rgba(255,255,255,.7);border-radius:10px;padding:9px 12px;font-size:.82rem;display:flex;gap:8px;align-items:flex-start}
+.alert-item .dot{width:10px;height:10px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.dot.red{background:var(--red)} .dot.orange{background:var(--orange)}
+.dot.yellow{background:var(--yellow)} .dot.black{background:var(--black)}
+.alert-item b{font-weight:800} .alert-item small{display:block;color:var(--ink-soft);font-weight:500;margin-top:1px}
+
+/* OUTPUT AREA (selectable always) */
+.output-wrap{margin-top:12px}
+.output-area{width:100%;min-height:200px;border:1px solid var(--line);border-radius:12px;padding:13px;font-size:13.5px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:#fbfcfd;color:var(--ink);line-height:1.55;white-space:pre-wrap;-webkit-user-select:text;user-select:text}
+.copy-hint{font-size:.74rem;color:var(--ink-soft);margin-top:6px;text-align:center}
+
+/* TEMPLATE SELECTOR */
+.tpl-tabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px}
+@media(max-width:520px){.tpl-tabs{grid-template-columns:1fr}}
+.tpl-tab{border:1px solid var(--line);background:#fff;border-radius:10px;padding:9px;font-size:.78rem;font-weight:700;color:var(--ink-soft)}
+.tpl-tab.active{background:var(--teal);color:#fff;border-color:transparent}
+
+/* CONFIG NAV */
+.cnav{display:flex;gap:7px;overflow-x:auto;padding-bottom:8px;margin-bottom:14px;-webkit-overflow-scrolling:touch}
+.cnav button{white-space:nowrap;border:1px solid var(--line);background:#fff;color:var(--navy);border-radius:20px;padding:8px 14px;font-size:.8rem;font-weight:700;flex-shrink:0}
+.cnav button.active{background:var(--navy);color:#fff;border-color:transparent}
+.module{display:none}
+.module.active{display:block}
+
+/* ITEM LIST */
+.item{display:flex;justify-content:space-between;gap:10px;align-items:flex-start;background:#fafcfd;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:7px}
+.item b{font-size:.9rem;color:var(--navy)} .item span{display:block;font-size:.74rem;color:var(--ink-soft);margin-top:2px}
+.item .acts{display:flex;gap:5px;flex-shrink:0}
+
+/* TOAST */
+#toast{position:fixed;bottom:96px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--navy);color:#fff;padding:12px 22px;border-radius:24px;font-weight:700;font-size:.86rem;opacity:0;pointer-events:none;transition:all .25s;z-index:200;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* BOTTOM NAV */
+.bottomnav{position:fixed;bottom:0;left:0;right:0;background:rgba(255,255,255,.96);backdrop-filter:blur(12px);border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr 1fr;padding:8px 8px calc(env(safe-area-inset-bottom) + 8px);z-index:100}
+.bottomnav button{background:none;border:none;color:var(--ink-soft);font-size:.68rem;font-weight:700;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px}
+.bottomnav button .ic{font-size:1.25rem}
+.bottomnav button.active{color:var(--teal)}
+
+/* PRIVACY BANNER */
+.privacy{background:var(--yellow-bg);border:1px solid #ecd98a;border-radius:12px;padding:11px 13px;font-size:.78rem;color:#6b5500;margin-bottom:14px;display:flex;gap:9px;align-items:flex-start}
+.privacy b{font-weight:800}
+
+/* MANUAL */
+.manual h4{font-size:.95rem;color:var(--navy);margin:14px 0 6px;font-weight:800}
+.manual p{font-size:.86rem;color:var(--ink-soft);margin-bottom:8px}
+.manual ul{margin:6px 0 12px 18px} .manual li{font-size:.84rem;margin-bottom:4px}
+.legend{display:flex;flex-direction:column;gap:6px;margin:10px 0}
+.legend div{display:flex;gap:9px;align-items:center;font-size:.82rem}
+.legend .chip{width:26px;height:26px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+
+.hidden{display:none!important}
+.muted{color:var(--ink-soft);font-size:.8rem}
+.divider{height:1px;background:var(--line);margin:14px 0}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="brand">
+      <h1>RadFlow Guard</h1>
+      <p>Organiza · valida · comunica</p>
+    </div>
+    <div class="metrics">
+      <div class="metric"><b id="nStudies">0</b><span>estudios</span></div>
+      <div class="metric"><b id="nServices">0</b><span>servicios</span></div>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="tabs">
+    <button class="tab active" data-view="vReport">📋 Reporte</button>
+    <button class="tab" data-view="vConfig">⚙️ Configuración</button>
+  </div>
+
+  <!-- ===================== VISTA REPORTE ===================== -->
+  <section id="vReport" class="view active">
+
+    <div class="modes">
+      <button class="modeBtn active" data-mode="mCase">🩻 Caso / Estudio</button>
+      <button class="modeBtn" data-mode="mShift">🕐 Turno</button>
+    </div>
+
+    <!-- ---------- MODO CASO ---------- -->
+    <div id="mCase" class="reportMode active">
+
+      <div class="flow" id="flowStepper">
+        <span data-f="service">Servicio</span>
+        <span data-f="doctor">Médico</span>
+        <span data-f="patient">Paciente</span>
+        <span data-f="clinical">Motivo</span>
+        <span data-f="study">Estudio</span>
+        <span data-f="rule">Sospecha</span>
+        <span data-f="prereq">Requisitos</span>
+        <span data-f="safety">Seguridad</span>
+        <span data-f="validate">Validación</span>
+        <span data-f="wa">WhatsApp</span>
+      </div>
+
+      <!-- STATUS -->
+      <div id="statusPanel" class="status-panel s-red">
+        <div class="status-head" id="statusHead">🔴 Falta información</div>
+        <div class="status-sub" id="statusSub">Completá los campos requeridos.</div>
+        <div class="alerts" id="alertsList"></div>
+      </div>
+
+      <!-- STEP 1: Origen de la solicitud -->
+      <div class="card">
+        <h3><span class="step">1</span> Origen de la solicitud</h3>
+        <label class="req">Servicio solicitante</label>
+        <select id="cService"><option value="">— Seleccionar —</option></select>
+        <div class="grid2">
+          <div><label class="req">Médico que presenta</label><input id="cDoctor" placeholder="Dr/Dra ..."></div>
+          <div><label class="req">Extensión / contacto</label><input id="cExt" placeholder="EXT o celular"></div>
+        </div>
+      </div>
+
+      <!-- STEP 2: Paciente -->
+      <div class="card">
+        <h3><span class="step">2</span> Paciente</h3>
+        <div class="grid2">
+          <div><label class="req">Nombre y apellido</label><input id="cName" placeholder="Nombre completo"></div>
+          <div><label>Cédula</label><input id="cId" placeholder="0-000-0000"></div>
+        </div>
+        <div class="grid3">
+          <div><label class="req">Edad</label><input id="cAge" placeholder="años / meses"></div>
+          <div><label>Sexo</label><select id="cSex"><option value="">—</option><option>Femenino</option><option>Masculino</option></select></div>
+          <div><label class="req">Ubicación</label><input id="cLoc" placeholder="Sala / cama"></div>
+        </div>
+        <label>Condición de traslado</label>
+        <select id="cTransport"><option value="">—</option><option>Deambula</option><option>Silla de ruedas</option><option>Camilla</option><option>Camilla + monitor</option><option>Ventilado / crítico</option></select>
+      </div>
+
+      <!-- STEP 3: Clínica -->
+      <div class="card">
+        <h3><span class="step">3</span> Información clínica</h3>
+        <label class="req">Motivo de consulta</label>
+        <textarea id="cChief" placeholder="Cuadro clínico breve"></textarea>
+        <label>Examen físico / signos vitales relevantes</label>
+        <textarea id="cExam" placeholder="Hallazgos, SatO2, FC, PA, Glasgow, estable/inestable..."></textarea>
+        <div class="grid2">
+          <div><label>APP (antecedentes)</label><input id="cApp" placeholder="HTA, DM, ERC..."></div>
+          <div><label>APQX (quirúrgicos)</label><input id="cApqx" placeholder="Cirugías previas"></div>
+        </div>
+        <label>Laboratorios relevantes</label>
+        <textarea id="cLabs" placeholder="BHC, creatinina, BUN, PFH, lipasa, dímero D, UA..."></textarea>
+      </div>
+
+      <!-- STEP 4: Estudio -->
+      <div class="card">
+        <h3><span class="step">4</span> Estudio solicitado</h3>
+        <label class="req">Estudio</label>
+        <input id="cStudySearch" list="studyList" placeholder="Escribí o elegí un estudio" autocomplete="off">
+        <datalist id="studyList"></datalist>
+        <div id="studyInfo" class="muted" style="margin-top:8px"></div>
+        <label class="req">Patología a descartar</label>
+        <input id="cRule" placeholder="¿Qué se quiere descartar?">
+      </div>
+
+      <!-- STEP 5: Requisitos dinámicos -->
+      <div class="card" id="dynReqCard">
+        <h3><span class="step">5</span> Requisitos del estudio</h3>
+        <div id="dynReqs"><p class="muted">Seleccioná un estudio para ver sus requisitos específicos.</p></div>
+      </div>
+
+      <!-- STEP 6: Seguridad / preparación -->
+      <div class="card">
+        <h3><span class="step">6</span> Seguridad y preparación</h3>
+        <div id="secContrast" class="hidden">
+          <label>Alergia a contraste / yodo</label>
+          <select id="cAlg"><option>No documentado</option><option>Sin alergia</option><option>Alergia leve previa</option><option>Alergia moderada/severa previa</option></select>
+        </div>
+        <div id="secIV" class="hidden">
+          <label>Canalización / acceso venoso</label>
+          <input id="cIv" placeholder="Ej: antecubital 18G verde, 20G rosada...">
+        </div>
+        <div id="secCreat" class="hidden">
+          <label>Creatinina / eGFR</label>
+          <input id="cCreat" placeholder="Valor reciente">
+        </div>
+        <div id="secMR" class="hidden">
+          <label>Tamizaje seguridad RM</label>
+          <select id="cMr"><option value="">— Seleccionar —</option><option>Completo sin contraindicaciones</option><option>Implante/dispositivo no verificado</option><option>Marcapasos / metal / claustrofobia</option></select>
+        </div>
+        <div id="secPreg" class="hidden">
+          <label>Embarazo / FUR / beta-hCG</label>
+          <select id="cPreg"><option value="">— Seleccionar —</option><option>No embarazada / no aplica</option><option>Posible embarazo</option><option>Embarazo confirmado</option></select>
+        </div>
+        <div id="secPrior" class="hidden">
+          <label>¿Imagen previa disponible?</label>
+          <select id="cPrior"><option value="">—</option><option>Sí</option><option>No</option></select>
+        </div>
+        <div id="secDimero" class="hidden">
+          <label>Dímero D (si sospecha TEP)</label>
+          <input id="cDimero" placeholder="Valor o 'pendiente'">
+        </div>
+        <p class="muted" id="secEmpty">Los campos de seguridad aparecen según el estudio seleccionado.</p>
+      </div>
+
+      <!-- STEP 7: Otros -->
+      <div class="card">
+        <h3><span class="step">7</span> Otros datos</h3>
+        <label>Evaluaciones de otros servicios</label>
+        <input id="cOther" placeholder="Interconsultas, notas...">
+        <label>Validación superior</label>
+        <select id="cSenior"><option value="">— Si aplica —</option><option>No requiere</option><option>Solicitada</option><option>Aprobada por superior</option></select>
+      </div>
+
+      <!-- STEP 8: WhatsApp output -->
+      <div class="card">
+        <h3><span class="step">8</span> Mensaje para WhatsApp</h3>
+        <div class="tpl-tabs">
+          <button class="tpl-tab active" data-tpl="service">Modelo servicio</button>
+          <button class="tpl-tab" data-tpl="rich">Enriquecido</button>
+          <button class="tpl-tab" data-tpl="pending">Solo pendientes</button>
+        </div>
+        <div class="output-wrap">
+          <textarea id="caseOutput" class="output-area" readonly></textarea>
+          <p class="copy-hint">Si el botón copiar no funciona en tu teléfono, tocá el texto, mantené presionado y elegí "Copiar".</p>
+        </div>
+        <div class="btn-row three">
+          <button class="btn" onclick="copyOutput('caseOutput')">📋 Copiar</button>
+          <button class="btn ghost" onclick="selectOutput('caseOutput')">🔲 Seleccionar</button>
+          <button class="btn green" onclick="openWhatsApp('caseOutput')">💬 WhatsApp</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn ghost" onclick="clearCase()">🗑️ Limpiar caso</button>
+          <button class="btn navy" onclick="buildCase()">🔄 Regenerar</button>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ---------- MODO TURNO ---------- -->
+    <div id="mShift" class="reportMode">
+      <div class="card">
+        <h3><span class="step">T</span> Datos del turno</h3>
+        <div class="grid2">
+          <div><label>Fecha</label><input id="shDate" type="date"></div>
+          <div><label>Residente</label><input id="shResident" placeholder="Nombre"></div>
+        </div>
+        <div class="grid2">
+          <div><label>Médico funcionario de turno</label><input id="shFunc" placeholder="Dr/Dra ..."></div>
+          <div><label>Aviso a central</label><select id="shCentral"><option value="">—</option><option>Avisado: recibe hospitalizados</option><option>Avisado: recibe hospitalizados + urgencias</option></select></div>
+        </div>
+        <label>Áreas a cubrir</label>
+        <input id="shAreas" placeholder="TC, USG, Urgencias...">
+        <label>Checklist de cierre de turno</label>
+        <div id="shiftChecks"></div>
+        <label>Pendientes del turno</label>
+        <textarea id="shPending" placeholder="Casos pendientes, reportes por recoger..."></textarea>
+      </div>
+
+      <div class="card">
+        <h3><span class="step">📤</span> Resumen de turno</h3>
+        <div class="output-wrap">
+          <textarea id="shiftOutput" class="output-area" readonly></textarea>
+          <p class="copy-hint">Mantené presionado el texto para copiar manualmente si hace falta.</p>
+        </div>
+        <div class="btn-row three">
+          <button class="btn" onclick="copyOutput('shiftOutput')">📋 Copiar</button>
+          <button class="btn ghost" onclick="selectOutput('shiftOutput')">🔲 Seleccionar</button>
+          <button class="btn green" onclick="openWhatsApp('shiftOutput')">💬 WhatsApp</button>
+        </div>
+        <div class="btn-row">
+          <button class="btn navy" onclick="buildShift()">🔄 Generar resumen</button>
+          <button class="btn gold" onclick="finishShift()">✅ Finalizar turno</button>
+        </div>
+      </div>
+    </div>
+
+  </section>
+
+  <!-- ===================== VISTA CONFIG ===================== -->
+  <section id="vConfig" class="view">
+    <div class="privacy">
+      <span>🔒</span>
+      <div><b>Privacidad:</b> esta herramienta guarda la configuración solo en este dispositivo (almacenamiento local del navegador). No subas datos de pacientes reales en equipos compartidos. Limpiá el caso al terminar. Usá solo conforme a la política de tu hospital.</div>
+    </div>
+
+    <div class="cnav">
+      <button class="active" data-mod="modServices">Servicios</button>
+      <button data-mod="modStudies">Estudios</button>
+      <button data-mod="modRotations">Rotaciones</button>
+      <button data-mod="modModalities">Modalidades</button>
+      <button data-mod="modShiftCfg">Turnos</button>
+      <button data-mod="modData">Datos</button>
+      <button data-mod="modManual">Manual</button>
+    </div>
+
+    <!-- Servicios -->
+    <div id="modServices" class="module active">
+      <div class="card">
+        <h3>Agregar servicio solicitante</h3>
+        <label>Nombre</label><input id="sName" placeholder="Ej: Urgencias">
+        <div class="grid2">
+          <div><label>Tipo</label><input id="sType" placeholder="Urgencias / Hospitalización..."></div>
+          <div><label>Extensión</label><input id="sExt" placeholder="EXT"></div>
+        </div>
+        <label>Prioridad</label>
+        <select id="sPri"><option>Emergencia</option><option>Urgente</option><option>Mixta</option><option>Electiva</option></select>
+        <label>Notas / estudios frecuentes</label>
+        <textarea id="sNotes" placeholder="Estudios típicos de este servicio"></textarea>
+        <button class="btn" style="margin-top:10px" onclick="addService()">+ Agregar servicio</button>
+      </div>
+      <div id="serviceList"></div>
+    </div>
+
+    <!-- Estudios -->
+    <div id="modStudies" class="module">
+      <div class="card">
+        <h3>Agregar estudio</h3>
+        <label>Nombre</label><input id="stName" placeholder="Ej: TC abdomen contrastada">
+        <div class="grid2">
+          <div><label>Modalidad</label><select id="stMod"></select></div>
+          <div><label>Región</label><input id="stRegion" placeholder="Cráneo, Abdomen..."></div>
+        </div>
+        <div class="grid2">
+          <div><label>¿Contraste?</label><select id="stContrast"><option>No</option><option>Sí</option></select></div>
+          <div><label>Prioridad</label><select id="stPri"><option>Alta</option><option>Media</option><option>Baja</option></select></div>
+        </div>
+        <label>Servicios frecuentes</label><input id="stServices" placeholder="Urgencias, MI...">
+        <label>Indicaciones / sospechas</label><textarea id="stInd" placeholder="Cuándo se pide"></textarea>
+        <button class="btn" style="margin-top:10px" onclick="addStudy()">+ Agregar estudio</button>
+      </div>
+      <div id="studyTable"></div>
+    </div>
+
+    <!-- Rotaciones -->
+    <div id="modRotations" class="module">
+      <div class="card">
+        <h3>Rotación mensual</h3>
+        <div class="grid2">
+          <div><label>Mes</label><input id="rMonth" placeholder="Ej: Junio 2026"></div>
+          <div><label>Residente</label><input id="rResident" placeholder="Nombre"></div>
+        </div>
+        <div class="grid2">
+          <div><label>Servicio asignado</label><input id="rService" placeholder="Servicio"></div>
+          <div><label>Área radiológica</label><input id="rArea" placeholder="TC / USG..."></div>
+        </div>
+        <label>Responsable superior</label><input id="rSenior" placeholder="Médico funcionario">
+        <label>Notas / checklist del mes</label><textarea id="rNotes"></textarea>
+        <button class="btn" style="margin-top:10px" onclick="addRotation()">+ Agregar rotación</button>
+      </div>
+      <div id="rotationList"></div>
+    </div>
+
+    <!-- Modalidades -->
+    <div id="modModalities" class="module">
+      <div class="card">
+        <h3>Modalidades</h3>
+        <label>Nombre</label><input id="mName" placeholder="Ej: AngioTC">
+        <label>Descripción</label><textarea id="mDesc"></textarea>
+        <button class="btn" style="margin-top:10px" onclick="addModality()">+ Agregar modalidad</button>
+      </div>
+      <div id="modalityList"></div>
+    </div>
+
+    <!-- Turnos config -->
+    <div id="modShiftCfg" class="module">
+      <div class="card">
+        <h3>Items del checklist de cierre de turno</h3>
+        <label>Nuevo item</label><input id="scItem" placeholder="Ej: Limpiar USG en uso">
+        <button class="btn" style="margin-top:10px" onclick="addShiftItem()">+ Agregar item</button>
+      </div>
+      <div id="shiftItemList"></div>
+    </div>
+
+    <!-- Datos / backup -->
+    <div id="modData" class="module">
+      <div class="card">
+        <h3>Respaldo de configuración</h3>
+        <p class="muted" style="margin-bottom:12px">Exportá tu configuración a un archivo para guardarla o compartirla con compañeras. Importá para restaurar.</p>
+        <div class="btn-row">
+          <button class="btn navy" onclick="exportData()">⬇️ Exportar JSON</button>
+          <button class="btn ghost" onclick="document.getElementById('importFile').click()">⬆️ Importar JSON</button>
+        </div>
+        <input type="file" id="importFile" accept=".json,application/json" class="hidden" onchange="importData(event)">
+        <div class="divider"></div>
+        <button class="btn" style="background:var(--red)" onclick="resetAll()">♻️ Restaurar valores de fábrica</button>
+      </div>
+    </div>
+
+    <!-- Manual -->
+    <div id="modManual" class="module">
+      <div class="card manual">
+        <h3>Manual de uso</h3>
+
+        <h4>¿Qué hace esta herramienta?</h4>
+        <p>RadFlow Guard <b>organiza, recuerda, valida y comunica</b>. Recolecta la información de una solicitud radiológica, revisa prerrequisitos según el estudio y la sospecha, y arma un mensaje listo para WhatsApp.</p>
+
+        <h4>¿Qué NO hace?</h4>
+        <ul>
+          <li>No decide si un estudio se hace o no.</li>
+          <li>No es una historia clínica oficial.</li>
+          <li>No diagnostica ni reemplaza al residente superior.</li>
+          <li>No rechaza pacientes — solo señala "no listo" o "requiere validación".</li>
+        </ul>
+
+        <h4>Modo Caso / Estudio</h4>
+        <p>Seguí el flujo de arriba hacia abajo: servicio → médico → paciente → clínica → estudio → sospecha. Los requisitos y campos de seguridad aparecen automáticamente según el estudio. El semáforo de arriba te dice si el caso está listo.</p>
+
+        <h4>Modo Turno</h4>
+        <p>Registrá los datos del turno y usá el checklist de cierre. Generá un resumen para pasar el turno por WhatsApp.</p>
+
+        <h4>Significado de las alertas</h4>
+        <div class="legend">
+          <div><span class="chip" style="background:var(--green-bg)">🟢</span> <b>Listo</b> — todo lo requerido está completo.</div>
+          <div><span class="chip" style="background:var(--yellow-bg)">🟡</span> <b>Falta no crítica</b> — puede avanzar con pendiente visible.</div>
+          <div><span class="chip" style="background:var(--orange-bg)">🟠</span> <b>Requiere preparación</b> — el paciente no está listo aún (ayuno, vejiga llena, canalización).</div>
+          <div><span class="chip" style="background:var(--red-bg)">🔴</span> <b>Falta crítica</b> — no marcar listo hasta resolver.</div>
+          <div><span class="chip" style="background:var(--black-bg)">⚫</span> <b>Validación superior</b> — escalar, no rechazar.</div>
+        </div>
+
+        <h4>Copiar en el teléfono</h4>
+        <p>El botón "Copiar" intenta copiar automáticamente. Si tu navegador lo bloquea (común al abrir el archivo directo en iPhone), usá "Seleccionar" y luego mantené presionado el texto para copiarlo a mano. El texto siempre está visible y seleccionable.</p>
+
+        <h4>Compartir y usar como app</h4>
+        <p>Para mejor experiencia, abrí la versión en línea (HTTPS) y usá "Agregar a pantalla de inicio". Así funciona el copiado automático y se ve como una app.</p>
+
+        <h4>Respaldo</h4>
+        <p>En la pestaña <b>Datos</b> podés exportar tu configuración (servicios, estudios, rotaciones) a un archivo JSON y compartirla con tus compañeras, o importar una configuración existente.</p>
+      </div>
+    </div>
+
+  </section>
+
+</div>
+
+<div id="toast">Copiado</div>
+
+<nav class="bottomnav">
+  <button id="navReport" class="active" onclick="goView('vReport')"><span class="ic">📋</span>Reporte</button>
+  <button id="navConfig" onclick="goView('vConfig')"><span class="ic">⚙️</span>Config</button>
+  <button id="navManual" onclick="goView('vConfig');goModule('modManual')"><span class="ic">📖</span>Manual</button>
+</nav>
+
+<script>
+/* ====================================================================
+   RADFLOW GUARD v2 — Motor universal (PC / Android / iPhone)
+   - Copiado en cascada: clipboard API → execCommand → selección manual
+   - Motor de validación completo (recuperado del prototipo v1)
+   - Catálogo de estudios ampliado
+   ==================================================================== */
+
+const KEY = 'radflow_guard_v2';
+
+/* ---------- CATÁLOGO DE REQUISITOS ---------- */
+const REQ = {
+  medico_presenta:['Médico que presenta','red','Necesario para devolver preguntas y responsabilizar la solicitud.'],
+  extension:['Extensión / contacto','red','Sin contacto no se pueden aclarar pendientes.'],
+  paciente:['Paciente identificado','red','Nombre/ID reducen riesgo administrativo.'],
+  edad:['Edad','red','Crítica en pediatría, contraste, protocolos y dosis.'],
+  ubicacion:['Ubicación','red','Necesaria para traslado y coordinación.'],
+  motivo:['Motivo de consulta','red','Sin motivo no se puede justificar ni protocolizar.'],
+  sospecha:['Patología a descartar','red','Determina protocolo, modalidad y fases.'],
+  alergia_contraste:['Alergia a contraste documentada','red','Obligatorio en estudios contrastados.'],
+  creatinina:['Creatinina / eGFR','red','Seguridad renal en contraste y gadolinio.'],
+  canalizacion:['Canalización adecuada','red','Necesaria para TC contrastada / AngioTC.'],
+  via_antecubital:['Vía antecubital para AngioTC','orange','Importante para el bolo de contraste.'],
+  dimero_d:['Dímero D si aplica','yellow','Puede requerirse en sospecha de TEP.'],
+  rx_torax:['Rx tórax reciente si TEP/disnea','yellow','Útil para diferencial/protocolo.'],
+  signos_vitales:['Signos vitales / estabilidad','red','Especialmente urgencias y traslado.'],
+  embarazo:['Embarazo / FUR / beta-hCG','black','Puede requerir validación superior.'],
+  rm_safety:['Tamizaje de seguridad RM','red','Implantes, marcapasos, metal, clips.'],
+  implante_rm:['Implante RM no verificado','black','Requiere validación antes de RM.'],
+  ayuno:['Ayuno','orange','Preparación previa para US hepatobiliar / fluoroscopia.'],
+  vejiga_llena:['Vejiga llena','orange','Necesaria para US pélvico suprapúbico.'],
+  imagen_previa:['Imagen previa','yellow','Útil para comparación.'],
+  anticoagulacion:['Estado de anticoagulación','yellow','Relevante en trauma, ictus, TVP, sangrado.'],
+  paciente_inestable:['Estabilidad del paciente','black','Inestable requiere validación y acompañamiento.'],
+  peso_pediatrico:['Peso (pediátrico)','orange','Necesario para dosis y protocolo pediátrico.'],
+  sedacion:['Plan de sedación','black','Pediátrico/no colaborador puede requerir sedación.']
+};
+
+/* ---------- DATOS SEMILLA (base de fábrica) ---------- */
+function baseData(){
+  return {
+    services: [
+      ['Urgencias','Urgencias','','Emergencia','TC cráneo, Rx tórax, AngioTC TEP, TC abdomen, US abdomen, Doppler TVP.'],
+      ['Medicina Interna','Hospitalización','','Mixta','TC tórax/abdomen, US abdomen, Doppler TVP.'],
+      ['Cirugía','Quirúrgico','','Urgente','TC abdomen, US hepatobiliar, postquirúrgico.'],
+      ['Pediatría','Hospitalización','','Mixta','US píloro, invaginación, NEC, Rx tórax.'],
+      ['UCI','UCI','','Emergencia','Validar traslado, monitor, ventilador y acompañamiento.'],
+      ['Urología','Hospitalización','','Mixta','US renal, UroTC, litiasis, hematuria.'],
+      ['Ortopedia / Trauma','Quirúrgico','','Mixta','Rx trauma, TC fracturas, RM MSK.'],
+      ['Neurología / Neurocirugía','Hospitalización','','Urgente','TC cráneo, AngioTC, RM cerebro/columna.'],
+      ['Ginecología / Obstetricia','Hospitalización','','Mixta','US pélvico, obstétrico, RM pelvis.'],
+      ['Gastroenterología','Hospitalización','','Mixta','ColangioRM, TC abdomen, US hepatobiliar.'],
+      ['Oncología','Hospitalización','','Electiva','TC tórax/abdomen/pelvis, estadificación.'],
+      ['Consulta externa','Ambulatorio','','Electiva','Estudios programados.']
+    ].map(x=>({name:x[0],type:x[1],ext:x[2],priority:x[3],notes:x[4]})),
+
+    rotations: [{month:'Mes actual',resident:'Karol',service:'Por definir',area:'TC / USG / Urgencias',senior:'Por definir',notes:'Actualizar cuando se confirme rotación mensual.'}],
+
+    modalities: [
+      ['Rx','Radiografía simple, portátil, trauma, tórax, abdomen.'],
+      ['USG','Ultrasonido en tiempo real, sin radiación.'],
+      ['Doppler','Evaluación de flujo vascular.'],
+      ['TC simple','Tomografía sin contraste.'],
+      ['TC contrastada','Tomografía con contraste yodado IV.'],
+      ['AngioTC','Estudio vascular con contraste y timing.'],
+      ['UroTC','TC multifásico de aparato urinario.'],
+      ['RM simple','Resonancia sin gadolinio.'],
+      ['RM contrastada','Resonancia con gadolinio.'],
+      ['ColangioRM','RM de vía biliar y pancreática.'],
+      ['Fluoroscopia','Estudios dinámicos baritados.'],
+      ['Medicina nuclear','Estudios funcionales con radiofármacos.'],
+      ['Intervencionismo','Procedimientos guiados por imagen.']
+    ].map(x=>({name:x[0],desc:x[1]})),
+
+    studies: [
+      {name:'TC cráneo simple',modality:'TC simple',region:'Cráneo',contrast:'No',services:'Urgencias, Neurología, UCI',priority:'Alta',ind:'Trauma, ictus, cefalea severa, déficit, hemorragia.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','signos_vitales','anticoagulacion']},
+      {name:'Rx tórax',modality:'Rx',region:'Tórax',contrast:'No',services:'Todos',priority:'Alta',ind:'Disnea, fiebre, control, neumonía.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha']},
+      {name:'AngioTC por TEP',modality:'AngioTC',region:'Tórax',contrast:'Sí',services:'Urgencias, MI, UCI',priority:'Alta',ind:'Sospecha de tromboembolismo pulmonar.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','alergia_contraste','creatinina','canalizacion','via_antecubital','dimero_d','rx_torax','signos_vitales']},
+      {name:'TC abdomen/pelvis contrastada',modality:'TC contrastada',region:'Abdomen/Pelvis',contrast:'Sí',services:'Urgencias, Cirugía, MI, Oncología',priority:'Alta',ind:'Dolor abdominal, sepsis, estadificación, postquirúrgico.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','alergia_contraste','creatinina','canalizacion']},
+      {name:'TC abdomen/pelvis simple',modality:'TC simple',region:'Abdomen/Pelvis',contrast:'No',services:'Urgencias, Urología',priority:'Media',ind:'Litiasis, control, contraste contraindicado.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha']},
+      {name:'US abdomen hepatobiliar',modality:'USG',region:'Abdomen',contrast:'No',services:'Cirugía, MI, Gastro, Urgencias',priority:'Alta',ind:'Dolor HCD, colecistitis, ictericia, PFH alteradas.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','ayuno']},
+      {name:'US renal / vías urinarias',modality:'USG',region:'Abdomen',contrast:'No',services:'Urología, MI, Urgencias',priority:'Media',ind:'Hidronefrosis, litiasis, ERC, hematuria.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha']},
+      {name:'US pélvico / transvaginal',modality:'USG',region:'Pelvis',contrast:'No',services:'Ginecología, Urgencias',priority:'Media',ind:'Dolor pélvico, sangrado, masa anexial.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','vejiga_llena']},
+      {name:'US testicular Doppler',modality:'Doppler',region:'Escroto',contrast:'No',services:'Urgencias, Urología',priority:'Alta',ind:'Dolor escrotal agudo, sospecha de torsión.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha']},
+      {name:'Doppler venoso MMII (TVP)',modality:'Doppler',region:'MMII',contrast:'No',services:'Urgencias, MI',priority:'Alta',ind:'Edema, dolor de pierna, sospecha de TVP.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','anticoagulacion']},
+      {name:'TC KUB / litiasis',modality:'TC simple',region:'Abdomen',contrast:'No',services:'Urología, Urgencias',priority:'Media',ind:'Cólico renal, hematuria, litiasis.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha']},
+      {name:'TC tórax contrastada',modality:'TC contrastada',region:'Tórax',contrast:'Sí',services:'MI, Oncología, Neumología',priority:'Media',ind:'Masa, estadificación, mediastino.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','alergia_contraste','creatinina','canalizacion']},
+      {name:'RM cerebro',modality:'RM simple',region:'Cráneo',contrast:'No',services:'Neurología, Neurocirugía',priority:'Media',ind:'Ictus subagudo, tumor, EM, epilepsia.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','rm_safety']},
+      {name:'RM columna',modality:'RM simple',region:'Columna',contrast:'No',services:'Neurología, Ortopedia',priority:'Media',ind:'Lumbociática, mielopatía, compresión.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','rm_safety']},
+      {name:'ColangioRM',modality:'ColangioRM',region:'Abdomen',contrast:'No',services:'Gastro, Cirugía',priority:'Media',ind:'Coledocolitiasis, estenosis biliar, páncreas.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','rm_safety','ayuno']},
+      {name:'TC trauma / politrauma',modality:'TC contrastada',region:'Cuerpo completo',contrast:'Sí',services:'Urgencias, UCI',priority:'Alta',ind:'Trauma mayor, politraumatizado.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','alergia_contraste','creatinina','canalizacion','signos_vitales','paciente_inestable']},
+      {name:'Rx trauma óseo',modality:'Rx',region:'Variable',contrast:'No',services:'Ortopedia, Urgencias',priority:'Alta',ind:'Sospecha de fractura/luxación.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha']},
+      {name:'UroTC',modality:'UroTC',region:'Abdomen/Pelvis',contrast:'Sí',services:'Urología',priority:'Media',ind:'Hematuria, tumor urotelial, anomalías.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','alergia_contraste','creatinina','canalizacion']},
+      {name:'US invaginación (pediátrico)',modality:'USG',region:'Abdomen',contrast:'No',services:'Pediatría, Urgencias',priority:'Alta',ind:'Lactante con dolor, masa, sangre en heces.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','peso_pediatrico']},
+      {name:'US píloro (pediátrico)',modality:'USG',region:'Abdomen',contrast:'No',services:'Pediatría',priority:'Media',ind:'Vómito en proyectil, sospecha de estenosis pilórica.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','peso_pediatrico']},
+      {name:'Rx abdomen (NEC pediátrico)',modality:'Rx',region:'Abdomen',contrast:'No',services:'Pediatría, UCI neonatal',priority:'Alta',ind:'Prematuro, distensión, sospecha de NEC.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','peso_pediatrico']},
+      {name:'Esofagograma / fluoroscopia',modality:'Fluoroscopia',region:'Esófago/GI',contrast:'Sí',services:'Gastro, Cirugía',priority:'Baja',ind:'Disfagia, fístula, control postquirúrgico.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','ayuno']},
+      {name:'RM pelvis',modality:'RM simple',region:'Pelvis',contrast:'No',services:'Ginecología, Urología, Oncología',priority:'Media',ind:'Estadificación, endometriosis, masa.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','rm_safety']},
+      {name:'AngioTC cerebral',modality:'AngioTC',region:'Cráneo',contrast:'Sí',services:'Neurología, Urgencias',priority:'Alta',ind:'Ictus, aneurisma, oclusión de gran vaso.',reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha','alergia_contraste','creatinina','canalizacion','signos_vitales']}
+    ],
+
+    shiftItems: ['Limpiar USG en uso','Recoger reporte en Tomografía','Recoger reporte en USG','Recoger reporte en Urgencias','Avisar a central cierre de turno']
+  };
+}
+
+/* ---------- PERSISTENCIA ---------- */
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function load(){
+  try{
+    const saved = JSON.parse(localStorage.getItem(KEY)||'null');
+    if(saved) return Object.assign(clone(baseData()), saved);
+  }catch(e){}
+  return clone(baseData());
+}
+let data = load();
+function save(){
+  try{ localStorage.setItem(KEY, JSON.stringify(data)); }catch(e){ toast('Aviso: no se pudo guardar local'); }
+  render();
+}
+
+/* ---------- UTILIDADES ---------- */
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function val(id){const e=document.getElementById(id);return e?(e.value||'').trim():''}
+function setv(id,v){const e=document.getElementById(id);if(e)e.value=v||''}
+function show(id,on){const e=document.getElementById(id);if(e)e.classList.toggle('hidden',!on)}
+function toast(m='Copiado'){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1700)}
+
+/* ====================================================================
+   COPIADO UNIVERSAL — cascada de 3 niveles
+   1) navigator.clipboard (HTTPS / contextos seguros)
+   2) execCommand('copy') (file:// en muchos navegadores)
+   3) seleccionar el texto para copiar a mano (iOS file://)
+   ==================================================================== */
+async function copyOutput(id){
+  const el = document.getElementById(id);
+  if(!el || !el.value.trim()){ toast('Nada que copiar'); return; }
+  const text = el.value;
+  // Nivel 1: Clipboard API
+  if(navigator.clipboard && window.isSecureContext){
+    try{ await navigator.clipboard.writeText(text); toast('✅ Copiado'); return; }catch(e){}
+  }
+  // Nivel 2: execCommand
+  try{
+    el.removeAttribute('readonly');
+    el.focus();
+    el.select();
+    el.setSelectionRange(0, text.length);
+    const ok = document.execCommand('copy');
+    el.setAttribute('readonly','');
+    if(ok){ toast('✅ Copiado'); return; }
+  }catch(e){}
+  // Nivel 3: selección manual
+  selectOutput(id);
+  toast('Seleccionado — mantené presionado y "Copiar"');
+}
+
+function selectOutput(id){
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.removeAttribute('readonly');
+  el.focus();
+  el.select();
+  el.setSelectionRange(0, (el.value||'').length);
+  el.setAttribute('readonly','');
+}
+
+function openWhatsApp(id){
+  const el = document.getElementById(id);
+  if(!el || !el.value.trim()){ toast('Generá el mensaje primero'); return; }
+  const text = encodeURIComponent(el.value);
+  // wa.me abre selector de chat; funciona en móvil y desktop
+  window.open('https://wa.me/?text='+text, '_blank');
+}
+
+/* ====================================================================
+   NAVEGACIÓN
+   ==================================================================== */
+function goView(v){
+  document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));
+  document.getElementById(v).classList.add('active');
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active', t.dataset.view===v));
+  document.getElementById('navReport').classList.toggle('active', v==='vReport');
+  document.getElementById('navConfig').classList.toggle('active', v==='vConfig');
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function goModule(m){
+  document.querySelectorAll('.module').forEach(x=>x.classList.remove('active'));
+  document.getElementById(m).classList.add('active');
+  document.querySelectorAll('.cnav button').forEach(b=>b.classList.toggle('active', b.dataset.mod===m));
+}
+
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>goView(b.dataset.view));
+document.querySelectorAll('.cnav button').forEach(b=>b.onclick=()=>goModule(b.dataset.mod));
+document.querySelectorAll('.modeBtn').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.modeBtn').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  document.querySelectorAll('.reportMode').forEach(v=>v.classList.remove('active'));
+  document.getElementById(b.dataset.mode).classList.add('active');
+});
+document.querySelectorAll('.tpl-tab').forEach(b=>b.onclick=()=>{
+  document.querySelectorAll('.tpl-tab').forEach(x=>x.classList.remove('active'));
+  b.classList.add('active');
+  buildCase();
+});
+
+/* ====================================================================
+   CONFIG — RENDER Y CRUD
+   ==================================================================== */
+function render(){
+  document.getElementById('nStudies').textContent = data.studies.length;
+  document.getElementById('nServices').textContent = data.services.length;
+  renderServices(); renderStudies(); renderRotations(); renderModalities(); renderShiftItems();
+  fillSelects(); validate();
+}
+
+function renderServices(){
+  document.getElementById('serviceList').innerHTML = data.services.map((s,i)=>
+    `<div class="item"><div><b>${esc(s.name)}</b><span>${esc(s.type)} · ${esc(s.priority)} ${s.ext?'· EXT '+esc(s.ext):''}<br>${esc(s.notes)}</span></div>
+    <div class="acts"><button class="ib" onclick="delItem('services',${i})">X</button></div></div>`).join('') || '<p class="muted">Sin servicios.</p>';
+}
+function addService(){
+  const o={name:val('sName'),type:val('sType'),ext:val('sExt'),priority:val('sPri'),notes:val('sNotes')};
+  if(!o.name)return toast('Falta nombre del servicio');
+  data.services.push(o); ['sName','sExt','sNotes'].forEach(id=>setv(id,'')); save(); toast('Servicio agregado');
+}
+
+function renderStudies(){
+  document.getElementById('studyTable').innerHTML = data.studies.map((s,i)=>
+    `<div class="item"><div><b>${esc(s.name)}</b><span>${esc(s.modality)} · ${esc(s.region)} · contraste: ${esc(s.contrast)}<br>${esc(s.ind||'')}</span></div>
+    <div class="acts"><button class="ib d" onclick="delItem('studies',${i})">X</button></div></div>`).join('') || '<p class="muted">Sin estudios.</p>';
+}
+function addStudy(){
+  const o={name:val('stName'),modality:val('stMod'),region:val('stRegion'),contrast:val('stContrast'),priority:val('stPri'),services:val('stServices'),ind:val('stInd'),
+    reqs:['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha']};
+  if(!o.name)return toast('Falta nombre del estudio');
+  if(o.contrast==='Sí')o.reqs.push('alergia_contraste','creatinina','canalizacion');
+  if(o.modality&&o.modality.includes('RM'))o.reqs.push('rm_safety');
+  data.studies.push(o); ['stName','stRegion','stServices','stInd'].forEach(id=>setv(id,'')); save(); toast('Estudio agregado');
+}
+
+function renderRotations(){
+  document.getElementById('rotationList').innerHTML = data.rotations.map((r,i)=>
+    `<div class="item"><div><b>${esc(r.month)} · ${esc(r.resident)}</b><span>${esc(r.service)} · ${esc(r.area)}<br>Superior: ${esc(r.senior)} · ${esc(r.notes||'')}</span></div>
+    <div class="acts"><button class="ib d" onclick="delItem('rotations',${i})">X</button></div></div>`).join('') || '<p class="muted">Sin rotaciones.</p>';
+}
+function addRotation(){
+  const o={month:val('rMonth'),resident:val('rResident'),service:val('rService'),area:val('rArea'),senior:val('rSenior'),notes:val('rNotes')};
+  if(!o.month)return toast('Falta el mes');
+  data.rotations.push(o); ['rMonth','rResident','rService','rArea','rSenior','rNotes'].forEach(id=>setv(id,'')); save(); toast('Rotación agregada');
+}
+
+function renderModalities(){
+  document.getElementById('modalityList').innerHTML = data.modalities.map((m,i)=>
+    `<div class="item"><div><b>${esc(m.name)}</b><span>${esc(m.desc)}</span></div>
+    <div class="acts"><button class="ib d" onclick="delItem('modalities',${i})">X</button></div></div>`).join('') || '<p class="muted">Sin modalidades.</p>';
+}
+function addModality(){
+  const o={name:val('mName'),desc:val('mDesc')};
+  if(!o.name)return toast('Falta nombre');
+  data.modalities.push(o); ['mName','mDesc'].forEach(id=>setv(id,'')); save(); toast('Modalidad agregada');
+}
+
+function renderShiftItems(){
+  document.getElementById('shiftItemList').innerHTML = data.shiftItems.map((it,i)=>
+    `<div class="item"><div><b>${esc(it)}</b></div><div class="acts"><button class="ib d" onclick="delItem('shiftItems',${i})">X</button></div></div>`).join('') || '<p class="muted">Sin items.</p>';
+  // checklist en modo turno
+  document.getElementById('shiftChecks').innerHTML = data.shiftItems.map((it,i)=>
+    `<label style="display:flex;gap:8px;align-items:center;font-weight:500;margin:6px 0"><input type="checkbox" style="width:auto" class="shchk" data-txt="${esc(it)}"> ${esc(it)}</label>`).join('');
+}
+function addShiftItem(){
+  const v=val('scItem'); if(!v)return toast('Escribí un item');
+  data.shiftItems.push(v); setv('scItem',''); save(); toast('Item agregado');
+}
+
+function delItem(arr,i){ data[arr].splice(i,1); save(); toast('Eliminado'); }
+
+function fillSelects(){
+  // Servicios en modo caso
+  const cs=document.getElementById('cService'); const cur=cs.value;
+  cs.innerHTML='<option value="">— Seleccionar —</option>'+data.services.map(s=>`<option>${esc(s.name)}</option>`).join('');
+  cs.value=cur;
+  // Modalidades en config estudios
+  const sm=document.getElementById('stMod');
+  if(sm)sm.innerHTML=data.modalities.map(m=>`<option>${esc(m.name)}</option>`).join('');
+  // Datalist de estudios
+  document.getElementById('studyList').innerHTML=data.studies.map(s=>`<option value="${esc(s.name)}">`).join('');
+}
+
+/* ====================================================================
+   MOTOR DE CASO — recoge campos, muestra secciones, valida
+   ==================================================================== */
+function currentStudy(){
+  const name=val('cStudySearch');
+  return data.studies.find(s=>s.name.toLowerCase()===name.toLowerCase())||null;
+}
+
+function C(){
+  return {
+    service:val('cService'), doctor:val('cDoctor'), ext:val('cExt'),
+    name:val('cName'), id:val('cId'), age:val('cAge'), sex:val('cSex'), loc:val('cLoc'), transport:val('cTransport'),
+    chief:val('cChief'), exam:val('cExam'), app:val('cApp'), apqx:val('cApqx'), labs:val('cLabs'),
+    study:currentStudy(), rule:val('cRule'),
+    alg:val('cAlg'), iv:val('cIv'), creat:val('cCreat'), mr:val('cMr'), preg:val('cPreg'),
+    prior:val('cPrior'), dimero:val('cDimero'),
+    other:val('cOther'), senior:val('cSenior')
+  };
+}
+
+/* Muestra/oculta secciones de seguridad según el estudio */
+function updateSafetySections(){
+  const s=currentStudy();
+  document.getElementById('studyInfo').innerHTML = s ?
+    `<b>${esc(s.modality)}</b> · ${esc(s.region)} · contraste: ${esc(s.contrast)}<br>${esc(s.ind||'')}` : '';
+  const reqs = s?s.reqs:[];
+  const has = k=>reqs.includes(k);
+  const contrast = s && (s.contrast==='Sí');
+  const isRM = s && s.modality.includes('RM');
+  show('secContrast', contrast || has('alergia_contraste'));
+  show('secIV', contrast || has('canalizacion'));
+  show('secCreat', contrast || isRM || has('creatinina'));
+  show('secMR', isRM || has('rm_safety'));
+  show('secPreg', s && (contrast || s.modality.includes('TC') || has('embarazo')));
+  show('secPrior', has('rx_torax') || has('imagen_previa') || (s && /TEP|tórax|torax/i.test(s.region+s.ind)));
+  show('secDimero', has('dimero_d'));
+  const anyVisible = (contrast||isRM||has('rm_safety')||has('dimero_d'));
+  show('secEmpty', !s);
+  // requisitos dinámicos
+  renderDynReqs(s);
+  // stepper
+  updateStepper();
+}
+
+function renderDynReqs(s){
+  const box=document.getElementById('dynReqs');
+  if(!s){box.innerHTML='<p class="muted">Seleccioná un estudio para ver sus requisitos específicos.</p>';return;}
+  const items = s.reqs.map(k=>{
+    const r=REQ[k]; if(!r)return '';
+    const color=r[1];
+    return `<div class="alert-item"><span class="dot ${color}"></span><div><b>${esc(r[0])}</b><small>${esc(r[2])}</small></div></div>`;
+  }).join('');
+  box.innerHTML=`<div class="alerts">${items}</div>`;
+}
+
+function updateStepper(){
+  const c=C();
+  const done={
+    service:!!c.service, doctor:!!(c.doctor&&c.ext), patient:!!(c.name&&c.age&&c.loc),
+    clinical:!!c.chief, study:!!c.study, rule:!!c.rule,
+    prereq:!!c.study, safety:true, validate:false, wa:false
+  };
+  document.querySelectorAll('#flowStepper span').forEach(sp=>{
+    sp.classList.toggle('on', !!done[sp.dataset.f]);
+  });
+}
+
+/* VALIDACIÓN — recuperada y mejorada del prototipo */
+function validate(){
+  const c=C(); const A=[];
+  const add=(lvl,t,d)=>A.push({lvl,t,d});
+
+  // Universales
+  if(!c.study) add('red','Seleccionar estudio','Sin estudio no hay motor de requisitos.');
+  if(!c.service) add('red','Falta servicio solicitante','Quién solicita el estudio.');
+  if(!c.doctor) add('red','Falta médico que presenta','Necesario para aclarar dudas.');
+  if(!c.ext) add('red','Falta extensión/contacto','No hay forma de devolver preguntas.');
+  if(!c.name) add('red','Falta identificación del paciente','Nombre/ID incompletos.');
+  if(!c.age) add('red','Falta edad','Crítica para protocolos y dosis.');
+  if(!c.loc) add('red','Falta ubicación','Necesaria para traslado.');
+  if(!c.chief) add('red','Falta motivo de consulta','No basta con el estudio.');
+  if(!c.rule) add('red','Falta patología a descartar','Determina el protocolo.');
+
+  if(c.study){
+    const reqs=c.study.reqs||[];
+    const contrast=(c.study.contrast==='Sí');
+    const isRM=c.study.modality.includes('RM');
+    const isTC=c.study.modality.includes('TC');
+    const txt=(c.rule+' '+c.chief+' '+c.study.name+' '+c.study.ind).toLowerCase();
+
+    if(reqs.includes('alergia_contraste') && contrast && c.alg==='No documentado')
+      add('red','Falta documentar alergia a contraste','Obligatorio en estudios contrastados.');
+    if(c.alg==='Alergia moderada/severa previa')
+      add('black','Alergia moderada/severa previa a contraste','Requiere validación superior y protocolo.');
+
+    if(reqs.includes('creatinina') && (contrast||isRM) && !c.creat)
+      add('red','Falta creatinina/eGFR','Seguridad renal en contraste/gadolinio.');
+
+    if(reqs.includes('canalizacion') && contrast && !c.iv)
+      add('red','Falta canalización','Necesaria para administrar contraste IV.');
+
+    if(reqs.includes('via_antecubital') && c.study.modality==='AngioTC' && !/antecubital|18|20|verde|rosada/i.test(c.iv))
+      add('orange','Vía antecubital recomendada para AngioTC','Importante para el bolo de contraste.');
+
+    if(reqs.includes('dimero_d') && /tep|embol/i.test(txt) && !c.dimero)
+      add('yellow','Dímero D pendiente','Puede requerirse en sospecha de TEP.');
+
+    if(reqs.includes('rx_torax') && /tep|disnea/i.test(txt) && c.prior!=='Sí')
+      add('yellow','Rx tórax previo recomendado','Útil para diferencial.');
+
+    if(reqs.includes('signos_vitales') && !/sat|fc|pa|ta|fr|glasgow|estable|inestable/i.test((c.exam+c.chief).toLowerCase()))
+      add('red','Faltan signos vitales / estabilidad','Especialmente en urgencias y traslado.');
+
+    if(reqs.includes('rm_safety') && isRM && c.mr!=='Completo sin contraindicaciones'){
+      if(c.mr==='Implante/dispositivo no verificado' || c.mr==='Marcapasos / metal / claustrofobia')
+        add('black','Seguridad RM no resuelta','Implante/metal requiere validación.');
+      else
+        add('red','Tamizaje de seguridad RM incompleto','Verificar implantes, metal, claustrofobia.');
+    }
+
+    if(reqs.includes('ayuno'))
+      add('orange','Verificar ayuno','Preparación previa para este estudio.');
+
+    if(reqs.includes('vejiga_llena'))
+      add('orange','Verificar vejiga llena','Necesaria para US pélvico suprapúbico.');
+
+    if(reqs.includes('peso_pediatrico') && !c.age)
+      add('orange','Peso/edad pediátrica','Necesario para dosis y protocolo.');
+
+    if((contrast||isTC) && c.sex==='Femenino' && c.preg==='Posible embarazo')
+      add('black','Posible embarazo + estudio con radiación/contraste','Requiere validación superior.');
+    if((contrast||isTC) && c.sex==='Femenino' && c.preg==='Embarazo confirmado')
+      add('black','Embarazo confirmado','Validar indicación y alternativas sin radiación.');
+    if((contrast||isTC) && c.sex==='Femenino' && !c.preg)
+      add('yellow','Estado de embarazo no documentado','Confirmar FUR/beta-hCG si aplica.');
+
+    if(c.transport==='Ventilado / crítico' || /inestable/i.test(c.exam.toLowerCase()))
+      add('black','Paciente crítico/inestable','Requiere validación, monitor y acompañamiento.');
+  }
+
+  renderStatus(A);
+  return A;
+}
+
+function renderStatus(A){
+  const panel=document.getElementById('statusPanel');
+  const head=document.getElementById('statusHead');
+  const sub=document.getElementById('statusSub');
+  const list=document.getElementById('alertsList');
+
+  // jerarquía: black > red > orange > yellow > green
+  let level='green';
+  if(A.some(a=>a.lvl==='yellow'))level='yellow';
+  if(A.some(a=>a.lvl==='orange'))level='orange';
+  if(A.some(a=>a.lvl==='red'))level='red';
+  if(A.some(a=>a.lvl==='black'))level='black';
+
+  const map={
+    green:['s-green','🟢 Listo','Todo lo requerido está completo.'],
+    yellow:['s-yellow','🟡 Falta dato no crítico','Puede avanzar con pendiente visible.'],
+    orange:['s-orange','🟠 Requiere preparación','El paciente no está listo aún.'],
+    red:['s-red','🔴 Falta información crítica','No marcar como listo hasta resolver.'],
+    black:['s-black','⚫ Requiere validación superior','Escalar — no rechazar.']
+  };
+  panel.className='status-panel '+map[level][0];
+  head.textContent=map[level][1];
+  sub.textContent=map[level][2];
+
+  // ordenar alertas por severidad
+  const order={black:0,red:1,orange:2,yellow:3};
+  A.sort((a,b)=>order[a.lvl]-order[b.lvl]);
+  list.innerHTML=A.map(a=>`<div class="alert-item"><span class="dot ${a.lvl}"></span><div><b>${esc(a.t)}</b><small>${esc(a.d)}</small></div></div>`).join('');
+
+  return level;
+}
+
+function statusLabel(){
+  const A=validate();
+  const order={black:0,red:1,orange:2,yellow:3};
+  let level='green';
+  if(A.some(a=>a.lvl==='yellow'))level='yellow';
+  if(A.some(a=>a.lvl==='orange'))level='orange';
+  if(A.some(a=>a.lvl==='red'))level='red';
+  if(A.some(a=>a.lvl==='black'))level='black';
+  return {green:'🟢 LISTO',yellow:'🟡 Falta no crítica',orange:'🟠 Requiere preparación',red:'🔴 Falta crítica',black:'⚫ Validación superior'}[level];
+}
+
+/* ====================================================================
+   GENERADOR DE MENSAJES WHATSAPP
+   ==================================================================== */
+function pendingList(){
+  return validate().map(a=>{
+    const ic={red:'🔴',orange:'🟠',yellow:'🟡',black:'⚫'}[a.lvl]||'•';
+    return `${ic} ${a.t}`;
+  });
+}
+
+function buildCase(){
+  const c=C();
+  const tpl=document.querySelector('.tpl-tab.active')?.dataset.tpl||'service';
+  const study=c.study?c.study.name:'(sin estudio)';
+  const pend=pendingList();
+  const status=statusLabel();
+  let out='';
+
+  if(tpl==='service'){
+    out =
+`🩻 SOLICITUD RADIOLÓGICA
+━━━━━━━━━━━━━━━
+📞 EXT: ${c.ext||'—'}
+👨‍⚕️ Médico: ${c.doctor||'—'}
+🏥 Servicio: ${c.service||'—'}
+━━━━━━━━━━━━━━━
+👤 Paciente: ${c.name||'—'}
+🆔 Cédula: ${c.id||'—'}
+🎂 Edad: ${c.age||'—'}${c.sex?' · '+c.sex:''}
+📍 Ubicación: ${c.loc||'—'}
+🚶 Traslado: ${c.transport||'—'}
+━━━━━━━━━━━━━━━
+📋 Motivo: ${c.chief||'—'}
+🔬 Examen/SV: ${c.exam||'—'}
+📜 APP: ${c.app||'—'}
+🔪 APQX: ${c.apqx||'—'}
+🧪 Labs: ${c.labs||'—'}
+━━━━━━━━━━━━━━━
+🎯 Estudio: ${study}
+❓ Descartar: ${c.rule||'—'}
+${c.study&&c.study.contrast==='Sí'?`💉 Canalización: ${c.iv||'—'}\n⚠️ Alergia contraste: ${c.alg||'—'}\n🧫 Creatinina: ${c.creat||'—'}\n`:''}${c.study&&c.study.modality.includes('RM')?`🧲 Seguridad RM: ${c.mr||'—'}\n`:''}${c.prior?`🖼️ Imagen previa: ${c.prior}\n`:''}👥 Otros servicios: ${c.other||'—'}
+🔼 Validación: ${c.senior||'—'}
+━━━━━━━━━━━━━━━
+ESTADO: ${status}
+${pend.length?'PENDIENTES:\n'+pend.join('\n'):'Sin pendientes ✅'}`;
+  }
+
+  else if(tpl==='rich'){
+    out =
+`🩻 *RADIOLOGÍA — RESUMEN*
+• Servicio: ${c.service||'—'}
+• Médico/EXT: ${c.doctor||'—'} / ${c.ext||'—'}
+• Paciente: ${c.name||'—'} (${c.age||'—'}${c.sex?', '+c.sex:''})
+• Ubicación: ${c.loc||'—'} · ${c.transport||'—'}
+• Motivo: ${c.chief||'—'}
+• Sospecha: ${c.rule||'—'}
+• Estudio: ${study}
+• Antecedentes: ${[c.app,c.apqx].filter(Boolean).join(' / ')||'—'}
+• Labs: ${c.labs||'—'}
+${c.study&&(c.study.contrast==='Sí'||c.study.modality.includes('RM'))?`• Seguridad: ${[c.alg!=='No documentado'?'Alergia:'+c.alg:'',c.creat?'Cr:'+c.creat:'',c.iv?'Vía:'+c.iv:'',c.mr?'RM:'+c.mr:''].filter(Boolean).join(' · ')||'verificar'}\n`:''}• Logística: ${c.transport||'—'}
+${c.prior?`• Imagen previa: ${c.prior}\n`:''}• Validación: ${c.senior||'—'}
+━━━━━━━━━━━━━━━
+*ESTADO:* ${status}
+${pend.length?'*Pendientes:*\n'+pend.join('\n'):'Sin pendientes ✅'}`;
+  }
+
+  else { // pending
+    out =
+`🩻 RADIOLOGÍA — PENDIENTES
+Paciente: ${c.name||'—'} · ${c.loc||'—'}
+Estudio: ${study}
+Solicita: ${c.doctor||'—'} (EXT ${c.ext||'—'})
+━━━━━━━━━━━━━━━
+${pend.length?pend.join('\n')+'\n\nPor favor completar para procesar.':'✅ No hay pendientes — listo para procesar.'}
+ESTADO: ${status}`;
+  }
+
+  setv('caseOutput', out);
+  updateStepper();
+  return out;
+}
+
+function clearCase(){
+  ['cDoctor','cExt','cName','cId','cAge','cLoc','cChief','cExam','cApp','cApqx','cLabs','cStudySearch','cRule','cIv','cCreat','cDimero','cOther'].forEach(id=>setv(id,''));
+  ['cSex','cTransport','cService','cPreg','cPrior','cSenior'].forEach(id=>setv(id,''));
+  setv('cAlg','No documentado'); setv('cMr','');
+  setv('caseOutput','');
+  updateSafetySections(); validate(); toast('Caso limpiado');
+}
+
+/* ====================================================================
+   MODO TURNO
+   ==================================================================== */
+function buildShift(){
+  const checks=[...document.querySelectorAll('.shchk')].map(ch=>`${ch.checked?'✅':'⬜'} ${ch.dataset.txt}`);
+  const out=
+`🕐 *RESUMEN DE TURNO — RADIOLOGÍA*
+📅 Fecha: ${val('shDate')||'—'}
+👤 Residente: ${val('shResident')||'—'}
+👨‍⚕️ Funcionario: ${val('shFunc')||'—'}
+📡 Central: ${val('shCentral')||'—'}
+📍 Áreas: ${val('shAreas')||'—'}
+━━━━━━━━━━━━━━━
+CIERRE DE TURNO:
+${checks.join('\n')||'(sin checklist)'}
+━━━━━━━━━━━━━━━
+PENDIENTES:
+${val('shPending')||'Sin pendientes ✅'}`;
+  setv('shiftOutput',out);
+  return out;
+}
+function finishShift(){
+  buildShift();
+  toast('Turno finalizado — copiá el resumen');
+}
+
+/* ====================================================================
+   BACKUP / EXPORT / IMPORT
+   ==================================================================== */
+function exportData(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url; a.download='radflow_config.json'; a.click();
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  toast('Configuración exportada');
+}
+function importData(ev){
+  const f=ev.target.files[0]; if(!f)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    try{
+      const obj=JSON.parse(r.result);
+      data=Object.assign(clone(baseData()),obj);
+      save(); toast('Configuración importada');
+    }catch(e){ toast('Archivo inválido'); }
+  };
+  r.readAsText(f);
+}
+function resetAll(){
+  if(confirm('¿Restaurar configuración de fábrica? Se perderán tus cambios.')){
+    data=clone(baseData()); save(); toast('Restaurado');
+  }
+}
+
+/* ====================================================================
+   LISTENERS — recalcular en vivo
+   ==================================================================== */
+const liveIds=['cService','cDoctor','cExt','cName','cId','cAge','cSex','cLoc','cTransport','cChief','cExam','cApp','cApqx','cLabs','cRule','cAlg','cIv','cCreat','cMr','cPreg','cPrior','cDimero','cOther','cSenior'];
+liveIds.forEach(id=>{
+  const e=document.getElementById(id);
+  if(e){ e.addEventListener('input',()=>{validate();buildCase();}); e.addEventListener('change',()=>{validate();buildCase();}); }
+});
+document.getElementById('cStudySearch').addEventListener('input',()=>{updateSafetySections();validate();buildCase();});
+document.getElementById('cStudySearch').addEventListener('change',()=>{updateSafetySections();validate();buildCase();});
+
+/* ---------- INIT ---------- */
+render();
+updateSafetySections();
+buildCase();
+
+</script>
+</body>
+</html>
