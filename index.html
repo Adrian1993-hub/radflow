@@ -1,0 +1,1525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="RadFlow">
+<meta name="theme-color" content="#0d2e41">
+<title>RadFlow Guard</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --navy:#0d2e41;--teal:#1a6b7a;--tl:#4a8a99;
+  --bg:#f4f6f8;--paper:#fff;--ink:#16242e;--soft:#5a6b76;--line:#dce4e9;
+  --gold:#c79a3a;--accent:#1a6b7a;
+  --green:#1f9d55;--gbg:#e3f6ec;--yel:#b8860b;--ybg:#fef9e7;
+  --ora:#d97706;--obg:#fdecd8;--red:#c0392b;--rbg:#fbe3e0;--blk:#2c3e50;--bbg:#dfe4e8;
+  --font-head:'Fraunces',Georgia,serif;--font-body:'Inter',-apple-system,sans-serif;
+  --sh:0 4px 18px rgba(13,46,65,.07);--r:16px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font-body);background:var(--bg);color:var(--ink);font-size:15px;line-height:1.5;padding-bottom:82px;-webkit-font-smoothing:antialiased;transition:background .3s,color .3s}
+body[data-dark="1"]{--sh:0 4px 20px rgba(0,0,0,.4)}
+.wrap{max-width:780px;margin:0 auto;padding:0 14px}
+header{background:linear-gradient(135deg,var(--navy),var(--teal));color:#fff;padding:calc(env(safe-area-inset-top)+16px) 0 18px;position:relative;overflow:hidden}
+header::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at 85% 30%,rgba(255,255,255,.08),transparent 50%);pointer-events:none}
+header .wrap{display:flex;align-items:center;justify-content:space-between;gap:10px;position:relative;z-index:1}
+.brand h1{font-family:var(--font-head);font-size:1.4rem;font-weight:600;letter-spacing:-.01em}
+.brand p{font-size:.7rem;color:rgba(255,255,255,.75);margin-top:1px;font-weight:500}
+.kpis{display:flex;gap:7px}
+.kpi{background:rgba(255,255,255,.13);border-radius:12px;padding:6px 10px;text-align:center;min-width:52px;backdrop-filter:blur(8px)}
+.kpi b{display:block;font-size:1rem;font-weight:800;font-family:var(--font-head)}.kpi span{font-size:.6rem;color:rgba(255,255,255,.8)}
+.view{display:none}.view.active{display:block;animation:fd .25s ease}
+@keyframes fd{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.card{background:var(--paper);border:1px solid var(--line);border-radius:var(--r);padding:16px;margin:13px 0;box-shadow:var(--sh)}
+.card h3{font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--accent);font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.card h3 .n{background:var(--accent);color:#fff;width:22px;height:22px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;font-size:.72rem;flex-shrink:0;font-weight:700}
+.card-title{font-family:var(--font-head);font-size:1.05rem;color:var(--ink);font-weight:600;margin-bottom:3px}
+label{display:block;font-size:.74rem;font-weight:600;color:var(--soft);margin:9px 0 3px}
+label.req::after{content:" *";color:var(--red)}
+input,select,textarea{width:100%;border:1px solid var(--line);border-radius:10px;padding:11px 12px;font-size:16px;font-family:inherit;background:var(--paper);color:var(--ink);transition:border .15s,box-shadow .15s}
+input::placeholder,textarea::placeholder{color:var(--soft);opacity:.7}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 14%,transparent)}
+textarea{resize:vertical;min-height:62px}
+select option{background:var(--paper);color:var(--ink)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+@media(max-width:500px){.g3{grid-template-columns:1fr 1fr}}
+button{cursor:pointer;font-family:inherit}
+.btn{background:var(--accent);color:#fff;border:none;border-radius:11px;padding:12px 15px;font-weight:700;font-size:.88rem;width:100%;transition:filter .15s,transform .1s}
+.btn:active{filter:brightness(.9);transform:scale(.98)}
+.btn.nv{background:var(--navy)}.btn.gn{background:var(--green)}.btn.go{background:var(--gold)}.btn.pu{background:var(--accent)}.btn.rd{background:var(--red)}
+.btn.gh{background:var(--paper);color:var(--ink);border:1px solid var(--line)}
+.br{display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:7px}
+.br3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-top:7px}
+@media(max-width:500px){.br3{grid-template-columns:1fr}}
+.ib{background:color-mix(in srgb,var(--accent) 8%,var(--paper));border:1px solid var(--line);color:var(--ink);border-radius:8px;padding:5px 9px;font-size:.72rem;font-weight:600}
+.ib.d{background:var(--rbg);color:var(--red);border-color:#f1c9c4}
+
+/* STATUS / ALERTA */
+.sp{border-radius:var(--r);padding:16px;margin:13px 0;border:2px solid}
+.sp.sg{background:var(--gbg);border-color:var(--green)}.sp.sy{background:var(--ybg);border-color:var(--yel)}
+.sp.so{background:var(--obg);border-color:var(--ora)}.sp.sr{background:var(--rbg);border-color:var(--red)}.sp.sb{background:var(--bbg);border-color:var(--blk)}
+body[data-dark="1"] .sp{background:color-mix(in srgb,var(--paper) 80%,transparent)}
+.sh{font-size:1.02rem;font-weight:800;display:flex;align-items:center;gap:8px;margin-bottom:3px;font-family:var(--font-head)}
+.ss{font-size:.78rem;color:var(--soft);font-weight:500}
+.als{margin-top:11px;display:flex;flex-direction:column;gap:6px}
+.ai{background:color-mix(in srgb,var(--paper) 70%,transparent);border-radius:10px;padding:9px 12px;font-size:.79rem;display:flex;gap:8px;align-items:flex-start}
+.ai .dot{width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.dot.red{background:var(--red)}.dot.orange{background:var(--ora)}.dot.yellow{background:var(--yel)}.dot.black{background:var(--blk)}.dot.green{background:var(--green)}
+.ai b{font-weight:700}.ai small{display:block;color:var(--soft);margin-top:1px}
+
+/* REQUISITOS CONDICIONALES */
+.req-box{background:color-mix(in srgb,var(--accent) 5%,var(--paper));border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:8px}
+.req-study{font-weight:700;color:var(--accent);font-size:.82rem;margin-bottom:7px;font-family:var(--font-head)}
+.req-item{display:flex;gap:9px;align-items:flex-start;padding:7px 0;border-bottom:1px dashed var(--line)}
+.req-item:last-child{border-bottom:none}
+.req-item .rdot{width:9px;height:9px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.req-item b{font-size:.82rem}.req-item small{display:block;color:var(--soft);font-size:.72rem;margin-top:1px}
+.req-lab-chip{display:inline-block;background:var(--accent);color:#fff;font-size:.66rem;font-weight:700;padding:1px 7px;border-radius:6px;margin-right:5px;font-family:var(--font-body)}
+
+/* STUDY SEARCH */
+.ss-wrap{position:relative}
+.ss-drop{position:absolute;left:0;right:0;top:100%;margin-top:3px;background:var(--paper);border:1px solid var(--tl);border-radius:12px;box-shadow:0 12px 34px rgba(0,0,0,.18);max-height:300px;overflow-y:auto;z-index:60;display:none;-webkit-overflow-scrolling:touch}
+.ss-drop.open{display:block}
+.sdg{font-size:.63rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);background:var(--bg);padding:6px 13px;position:sticky;top:0}
+.sdi{padding:11px 13px;border-bottom:1px solid var(--line);cursor:pointer}
+.sdi:last-child{border-bottom:none}.sdi:active,.sdi.hl{background:var(--accent);color:#fff}
+.sdi b{font-size:.88rem;display:block}.sdi span{font-size:.7rem;color:var(--soft)}
+.sdi:active span,.sdi.hl span{color:rgba(255,255,255,.85)}
+.sde{padding:13px;text-align:center;color:var(--soft);font-size:.82rem}
+.schips{display:flex;flex-direction:column;gap:7px;margin-top:9px}
+.schip{background:var(--bg);border:1px solid var(--line);border-left:4px solid var(--accent);border-radius:10px;padding:9px 11px;display:flex;justify-content:space-between;gap:9px;align-items:flex-start}
+.schip b{font-size:.88rem;color:var(--ink)}.schip span{font-size:.7rem;color:var(--soft);display:block;margin-top:1px}
+
+/* LABS GRID */
+.labs-help{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin:6px 0}
+.labs-legend{font-size:.68rem;color:var(--soft);display:flex;align-items:center;gap:5px}
+.labs-legend .sug-dot{width:14px;height:14px;border-radius:4px;background:color-mix(in srgb,var(--accent) 22%,var(--paper));border:2px solid var(--accent)}
+.labs-grid{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.lab-btn{position:relative;border:1.5px solid var(--line);background:var(--paper);color:var(--ink);border-radius:9px;padding:7px 10px;font-size:.78rem;font-weight:600;display:flex;align-items:center;gap:4px;cursor:pointer;transition:all .12s}
+.lab-btn.on{background:var(--accent);color:#fff;border-color:transparent}
+.lab-btn.has-val{background:var(--navy);color:#fff;border-color:transparent}
+.lab-btn.suggested{border:2px solid var(--accent);background:color-mix(in srgb,var(--accent) 16%,var(--paper));color:var(--accent);font-weight:800;box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 22%,transparent),0 2px 8px color-mix(in srgb,var(--accent) 30%,transparent);transform:translateY(-1px)}
+body[data-dark="1"] .lab-btn.suggested{color:var(--ink)}
+.lab-btn.suggested::after{content:'★';position:absolute;top:-7px;right:-5px;font-size:.7rem;background:var(--accent);color:#fff;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;box-shadow:0 1px 4px rgba(0,0,0,.25)}
+.lab-val{font-size:.7rem;background:rgba(255,255,255,.28);padding:1px 5px;border-radius:5px}
+.lab-input-row{display:flex;gap:8px;align-items:center;margin:5px 0;background:color-mix(in srgb,var(--accent) 6%,var(--paper));border-radius:10px;padding:8px 11px}
+.lab-input-row .lr-label{min-width:88px;flex-shrink:0}
+.lab-input-row .lr-ab{font-size:.8rem;color:var(--accent);font-weight:700}
+.lab-input-row .lr-full{font-size:.64rem;color:var(--soft);display:block}
+.lab-input-row input{flex:1;max-width:120px;padding:7px 9px;font-size:14px}
+.lab-input-row .lr-unit{font-size:.72rem;color:var(--soft);min-width:42px;font-weight:600}
+.lab-input-row .lr-rm{background:var(--rbg);color:var(--red);border:none;border-radius:7px;padding:5px 8px;font-size:.7rem;font-weight:700;flex-shrink:0}
+.lab-group-label{font-size:.64rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;color:var(--soft);width:100%;margin:6px 0 1px}
+
+/* OUTPUT */
+.out{width:100%;min-height:200px;border:1px solid var(--line);border-radius:12px;padding:13px;font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:color-mix(in srgb,var(--bg) 60%,var(--paper));color:var(--ink);line-height:1.55;white-space:pre-wrap;-webkit-user-select:text;user-select:text}
+.copy-hint{font-size:.7rem;color:var(--soft);margin-top:5px;text-align:center}
+.ttabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:5px;margin-bottom:9px}
+@media(max-width:500px){.ttabs{grid-template-columns:1fr}}
+.ttab{border:1px solid var(--line);background:var(--paper);border-radius:10px;padding:8px;font-size:.74rem;font-weight:600;color:var(--soft)}
+.ttab.active{background:var(--accent);color:#fff;border-color:transparent}
+
+/* VOZ */
+.voice-modes{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px}
+.vm{border:1px solid var(--line);background:var(--paper);border-radius:9px;padding:7px 11px;font-size:.78rem;font-weight:600;color:var(--soft)}
+.vm.active{background:var(--accent);color:#fff;border-color:transparent}
+.rec-indicator{display:flex;align-items:center;gap:10px;background:color-mix(in srgb,var(--red) 10%,var(--paper));border:1px solid color-mix(in srgb,var(--red) 30%,transparent);border-radius:12px;padding:11px 14px;margin:8px 0;opacity:.5}
+.rec-indicator.live{opacity:1}
+.rec-dot{width:14px;height:14px;border-radius:50%;background:var(--red);flex-shrink:0}
+.rec-indicator.live .rec-dot{animation:pulse 1s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.rec-wave{display:flex;align-items:center;gap:2px;height:24px;flex:1}
+.rec-wave span{width:3px;background:var(--red);border-radius:2px;height:6px}
+.rec-indicator.live .rec-wave span{animation:wave .9s ease-in-out infinite}
+.rec-indicator.live .rec-wave span:nth-child(2){animation-delay:.1s}.rec-indicator.live .rec-wave span:nth-child(3){animation-delay:.2s}
+.rec-indicator.live .rec-wave span:nth-child(4){animation-delay:.3s}.rec-indicator.live .rec-wave span:nth-child(5){animation-delay:.15s}
+.rec-indicator.live .rec-wave span:nth-child(6){animation-delay:.25s}.rec-indicator.live .rec-wave span:nth-child(7){animation-delay:.05s}
+@keyframes wave{0%,100%{height:6px}50%{height:22px}}
+.rec-time{font-family:ui-monospace,monospace;font-weight:700;font-size:.9rem;color:var(--red)}
+.voice-table{width:100%;border-collapse:collapse;font-size:.8rem;margin-top:8px}
+.voice-table th{background:var(--navy);color:#fff;padding:7px 10px;text-align:left;font-weight:600;font-size:.72rem}
+.voice-table td{padding:7px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+.conf-a{color:var(--green);font-weight:700}.conf-m{color:var(--yel);font-weight:700}.conf-b{color:var(--soft)}
+.rev-flag{background:var(--ybg);border:1px solid var(--yel);border-radius:5px;padding:2px 6px;font-size:.68rem;font-weight:700;color:var(--yel)}
+.miss-list,.q-list{margin-top:8px;display:flex;flex-direction:column;gap:5px}
+.miss-item{background:var(--rbg);border-radius:8px;padding:7px 10px;font-size:.78rem;color:var(--red);font-weight:600}
+.q-item{background:var(--ybg);border-radius:8px;padding:7px 10px;font-size:.78rem;color:var(--ink)}
+
+/* CALENDARIO */
+.cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.cal-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+@media(max-width:500px){.cal-kpis{grid-template-columns:repeat(2,1fr)}}
+.ck{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px;text-align:center}
+.ck b{display:block;font-size:1.1rem;font-weight:800;color:var(--ink);font-family:var(--font-head)}.ck span{font-size:.64rem;color:var(--soft)}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
+.dow{text-align:center;font-size:.62rem;font-weight:700;color:var(--soft);padding:4px}
+.day{background:var(--paper);border:1px solid var(--line);border-radius:9px;padding:5px;min-height:54px;cursor:pointer;transition:transform .1s;position:relative}
+.day:active{transform:scale(.95)}
+.day.empty{background:transparent;border-color:transparent;cursor:default}
+.day.weekend{background:color-mix(in srgb,var(--bg) 50%,var(--paper))}
+.day.holiday{background:color-mix(in srgb,var(--yel) 14%,var(--paper))}
+.day.hasturno{background:color-mix(in srgb,var(--red) 12%,var(--paper))}
+.day.haslibre{background:color-mix(in srgb,var(--green) 12%,var(--paper))}
+.day.hasvac{background:color-mix(in srgb,#7c3aed 14%,var(--paper))}
+.day.selected{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent)}
+.day .num{font-size:.78rem;font-weight:700;color:var(--ink);margin-bottom:2px}
+.day.holiday .num{color:var(--yel)}
+.dtags{display:flex;flex-wrap:wrap;gap:2px}
+.dtag{font-size:.56rem;font-weight:800;border-radius:4px;padding:1px 5px}
+.dtag.pl{background:#ddf0ff;color:#1a6b7a}
+.dtag.t{background:var(--red);color:#fff}
+.dtag.l{background:var(--green);color:#fff}
+.dtag.v{background:#7c3aed;color:#fff}
+.dtag.post{background:#ffe0e0;color:#8b1a1a}.dtag.fat{background:#ff6b6b;color:#fff}
+.dtag.hol{background:var(--yel);color:#fff}
+.dtag.paid{background:var(--gbg);color:var(--green)}.dtag.pend{background:var(--ybg);color:var(--yel)}
+.day-edit{border-radius:var(--r);border:2px solid var(--tl);padding:14px;margin-top:12px;background:var(--paper)}
+.state-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.state-btn{border:2px solid var(--line);background:var(--paper);border-radius:11px;padding:11px 6px;font-weight:800;font-size:.82rem;color:var(--soft);transition:all .12s}
+.state-btn.st-t.active{background:var(--red);color:#fff;border-color:transparent}
+.state-btn.st-l.active{background:var(--green);color:#fff;border-color:transparent}
+.state-btn.st-v.active{background:#7c3aed;color:#fff;border-color:transparent}
+.shift-summary{background:color-mix(in srgb,var(--accent) 5%,var(--paper));border:1px solid var(--line);border-radius:12px;padding:12px;margin-top:12px}
+.ss-row{display:flex;gap:8px;align-items:flex-start;font-size:.8rem;padding:4px 0}
+.ss-badge{font-size:.62rem;font-weight:800;border-radius:5px;padding:2px 7px;flex-shrink:0;margin-top:1px}
+.ss-badge.t{background:var(--red);color:#fff}.ss-badge.h{background:var(--yel);color:#fff}
+.ss-badge.l{background:var(--green);color:#fff}.ss-badge.v{background:#7c3aed;color:#fff}
+
+/* CONFIG */
+.cnav{display:flex;gap:6px;overflow-x:auto;padding-bottom:7px;margin-bottom:13px;-webkit-overflow-scrolling:touch}
+.cnav button{white-space:nowrap;border:1px solid var(--line);background:var(--paper);color:var(--ink);border-radius:18px;padding:7px 13px;font-size:.76rem;font-weight:600;flex-shrink:0}
+.cnav button.active{background:var(--navy);color:#fff;border-color:transparent}
+.mod{display:none}.mod.active{display:block}
+.item{display:flex;justify-content:space-between;gap:9px;align-items:flex-start;background:var(--paper);border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:6px}
+.item b{font-size:.86rem;color:var(--ink)}.item span{display:block;font-size:.7rem;color:var(--soft);margin-top:1px}
+.item .acts{display:flex;gap:4px;flex-shrink:0}
+.privacy{background:var(--ybg);border:1px solid color-mix(in srgb,var(--yel) 40%,transparent);border-radius:11px;padding:10px 12px;font-size:.74rem;color:var(--ink);margin-bottom:13px;display:flex;gap:8px}
+.privacy b{font-weight:700}
+.theme-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px}
+@media(max-width:420px){.theme-grid{grid-template-columns:1fr}}
+.theme-card{border:2px solid var(--line);border-radius:14px;padding:12px;cursor:pointer;transition:all .15s;background:var(--paper);position:relative}
+.theme-card.active{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb,var(--accent) 18%,transparent)}
+.theme-card.active::after{content:'✓';position:absolute;top:8px;right:10px;color:var(--accent);font-weight:800}
+.theme-swatches{display:flex;gap:5px;margin-bottom:8px}
+.theme-sw{width:26px;height:26px;border-radius:7px;border:1px solid rgba(0,0,0,.1)}
+.theme-card b{font-size:.88rem;color:var(--ink);font-family:var(--font-head)}
+.theme-card span{font-size:.7rem;color:var(--soft);display:block;margin-top:1px}
+
+/* MODALIDADES EXPANDIBLES */
+.mod-card{background:var(--paper);border:1px solid var(--line);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.mod-head{padding:12px 14px;cursor:pointer;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.mod-head .mh-l{flex:1}
+.mod-head .tag{font-size:.62rem;font-weight:700;color:var(--accent);text-transform:uppercase;letter-spacing:.04em}
+.mod-head b{font-size:.92rem;color:var(--ink);display:block;margin-top:1px;font-family:var(--font-head)}
+.mod-head .chev{font-size:.9rem;color:var(--soft);transition:transform .2s;flex-shrink:0}
+.mod-card.open .chev{transform:rotate(180deg)}
+.mod-body{display:none;padding:0 14px 14px;border-top:1px solid var(--line)}
+.mod-card.open .mod-body{display:block;animation:fd .2s}
+.mod-body .mdesc{font-size:.82rem;color:var(--ink);margin:10px 0;font-style:italic}
+.mod-sect{margin-top:10px}
+.mod-sect .ms-t{font-size:.68rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;display:flex;align-items:center;gap:5px;margin-bottom:3px}
+.mod-sect .ms-t.use{color:var(--green)}.mod-sect .ms-t.avoid{color:var(--red)}.mod-sect .ms-t.uniq{color:var(--accent)}.mod-sect .ms-t.contra{color:var(--ora)}.mod-sect .ms-t.prep{color:var(--soft)}
+.mod-sect p{font-size:.79rem;color:var(--soft);margin:0}
+
+/* MANUAL */
+.manual h4{font-family:var(--font-head);font-size:1rem;color:var(--ink);margin:16px 0 5px;font-weight:600}
+.manual p{font-size:.83rem;color:var(--soft);margin-bottom:7px}
+.manual ul{margin:5px 0 11px 16px}.manual li{font-size:.81rem;margin-bottom:4px;color:var(--soft)}
+.manual li b{color:var(--ink)}
+.lgd{display:flex;flex-direction:column;gap:6px;margin:9px 0}
+.lgd div{display:flex;gap:8px;align-items:flex-start;font-size:.8rem}
+.lgd .chip{width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0;margin-top:1px}
+.manual-footer{text-align:right;margin-top:24px;padding-top:14px;border-top:1px solid var(--line);font-family:var(--font-head);font-size:.92rem;color:var(--accent);font-style:italic}
+
+/* RESÚMENES */
+.sum-type-grid{display:grid;grid-template-columns:1fr;gap:8px;margin-top:6px}
+.sum-type-card{display:flex;gap:11px;align-items:flex-start;border:2px solid var(--line);border-radius:13px;padding:11px;cursor:pointer;background:var(--paper);transition:all .14s}
+.sum-type-card.active{border-color:var(--tc);box-shadow:0 0 0 3px color-mix(in srgb,var(--tc) 18%,transparent)}
+.sum-type-card:active{transform:scale(.99)}
+.stc-icon{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.25rem;flex-shrink:0;color:#fff}
+.stc-body b{font-size:.92rem;color:var(--ink);font-family:var(--font-head);display:block;line-height:1.25}
+.stc-body span{font-size:.74rem;color:var(--soft);display:block;margin-top:2px;line-height:1.35}
+.sum-form-card{padding:16px}
+.sum-form-head{display:flex;gap:11px;align-items:center}
+.sfh-icon{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;font-size:1.2rem;color:#fff;flex-shrink:0}
+.sum-sec{margin:10px 0;padding:11px;border:1px solid var(--line);border-radius:11px;background:color-mix(in srgb,var(--bg) 50%,var(--paper))}
+.sum-sec.emphasis{border-left:4px solid var(--navy);background:color-mix(in srgb,var(--navy) 5%,var(--paper))}
+.sum-sec.critical{border:1.5px solid var(--red);border-left:4px solid var(--red);background:var(--rbg)}
+.sum-sec-label{display:flex;align-items:center;gap:6px;font-weight:700;color:var(--ink);font-size:.82rem;margin-bottom:5px}
+.sum-sec.critical .sum-sec-label{color:var(--red)}
+.crit-tag{background:var(--red);color:#fff;font-size:.6rem;font-weight:800;padding:1px 7px;border-radius:6px;letter-spacing:.04em}
+.sum-sec textarea{background:var(--paper);font-size:15px}
+.item .ib{background:color-mix(in srgb,var(--accent) 9%,var(--paper));border:1px solid var(--line);color:var(--accent);border-radius:7px;padding:5px 9px;font-size:.72rem;font-weight:700;cursor:pointer}
+
+/* TOAST + NAV */
+#toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(18px);background:var(--navy);color:#fff;padding:11px 20px;border-radius:22px;font-weight:600;font-size:.82rem;opacity:0;pointer-events:none;transition:all .22s;z-index:200;box-shadow:0 8px 28px rgba(0,0,0,.3);max-width:88vw;text-align:center}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.bnav{position:fixed;bottom:0;left:0;right:0;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(14px);border-top:1px solid var(--line);display:grid;grid-template-columns:repeat(6,1fr);padding:6px 2px calc(env(safe-area-inset-bottom)+6px);z-index:100}
+.bnav button{background:none;border:none;color:var(--soft);font-size:.55rem;font-weight:600;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;transition:color .15s}
+.bnav button .ic{font-size:1.1rem}.bnav button.active{color:var(--accent)}
+.hidden{display:none!important}
+.muted{color:var(--soft);font-size:.78rem}
+.div{height:1px;background:var(--line);margin:12px 0}
+.collapse-h{cursor:pointer;display:flex;justify-content:space-between;align-items:center}
+</style>
+</head>
+<body data-theme="clinico" data-dark="0">
+<header>
+  <div class="wrap">
+    <div class="brand"><h1>RadFlow Guard</h1><p>CHDr AAM · Radiología</p></div>
+    <div class="kpis">
+      <div class="kpi"><b id="kStudies">0</b><span>estudios</span></div>
+      <div class="kpi"><b id="kHistory">0</b><span>historial</span></div>
+      <div class="kpi"><b id="kShifts">0</b><span>turnos</span></div>
+    </div>
+  </div>
+</header>
+<div class="wrap">
+
+<!-- ===== CASO ===== -->
+<section id="vCaso" class="view active">
+  <div class="card"><h3><span class="n">1</span> Origen</h3>
+    <label class="req">Servicio</label><select id="cServicio"><option value="">— Seleccionar —</option></select>
+    <div class="g2">
+      <div><label class="req">Médico que presenta</label><input id="cMedico" placeholder="Dr/Dra ..."></div>
+      <div><label class="req">EXT / contacto</label><input id="cExt" inputmode="tel" placeholder="EXT o celular"></div>
+    </div>
+  </div>
+
+  <div class="card"><h3><span class="n">2</span> Paciente</h3>
+    <div class="g2">
+      <div><label class="req">Nombre y apellido</label><input id="cPaciente" placeholder="Nombre completo"></div>
+      <div><label>Cédula / ID</label><input id="cCedula" placeholder="0-000-0000"></div>
+    </div>
+    <div class="g3">
+      <div><label class="req">Edad</label><input id="cEdad" placeholder="años / meses" inputmode="numeric"></div>
+      <div><label>Sexo</label><select id="cSexo"><option value="">—</option><option>Femenino</option><option>Masculino</option></select></div>
+      <div><label class="req">Ubicación</label><input id="cUbicacion" placeholder="Sala / cama"></div>
+    </div>
+    <div class="g2">
+      <div><label>APP</label><input id="cApp" placeholder="HTA, DM, ERC..."></div>
+      <div><label>APQX</label><input id="cApqx" placeholder="Cirugías previas"></div>
+    </div>
+    <label>Alergia</label><input id="cAlergia" placeholder="Medicamentos, contraste, yodo, látex... o vacío si ninguna">
+    <label>Traslado</label>
+    <select id="cTraslado"><option value="">—</option><option>Deambula</option><option>Silla de ruedas</option><option>Camilla</option><option>Camilla + monitor</option><option>Ventilado / crítico</option></select>
+  </div>
+
+  <div class="card"><h3><span class="n">3</span> Clínica</h3>
+    <label class="req">Historia / motivo</label><textarea id="cHistoria" placeholder="Cuadro clínico breve"></textarea>
+    <label>Examen físico / SV</label><textarea id="cExamen" placeholder="Hallazgos, SatO2, FC, PA, Glasgow, estable/inestable..."></textarea>
+  </div>
+
+  <div class="card"><h3><span class="n">4</span> Estudios solicitados</h3>
+    <label class="req">Buscar y agregar estudio</label>
+    <div class="ss-wrap"><input id="cStudySearch" placeholder="Escribí: TC, US, abdomen, tórax..." autocomplete="off"><div id="studyDrop" class="ss-drop"></div></div>
+    <p class="muted" style="margin-top:5px">Podés agregar varios estudios al mismo paciente.</p>
+    <div id="studyChips" class="schips"></div>
+    <label class="req" style="margin-top:11px">Patología a descartar</label>
+    <input id="cDescartar" placeholder="¿Qué se quiere descartar?">
+  </div>
+
+  <div class="card"><h3><span class="n">5</span> Laboratorios</h3>
+    <div class="labs-help"><span class="labs-legend"><span class="sug-dot"></span> con ★ = sugerido por el estudio</span></div>
+    <p class="muted" style="margin:-2px 0 4px">Tocá para activar; volvé a tocar para quitar. Escribí el valor (la unidad se agrega sola).</p>
+    <div class="labs-grid" id="labsGrid"></div>
+    <div id="labsActive"></div>
+  </div>
+
+  <div class="card"><h3><span class="n">6</span> Requisitos del estudio</h3>
+    <p class="muted" style="margin:-4px 0 4px">Exámenes y condiciones que <b>dependen del estudio</b> seleccionado.</p>
+    <div id="dynReqs"><p class="muted">Agregá un estudio para ver sus requisitos condicionales.</p></div>
+  </div>
+
+  <div class="card"><h3><span class="n">7</span> Seguridad / preparación</h3>
+    <div id="secIV" class="hidden"><label>Canalización / acceso venoso</label><input id="cCanaliz" placeholder="Ej: antecubital 18G verde..."></div>
+    <div id="secMR" class="hidden"><label>Tamizaje seguridad RM</label><select id="cRmSafety"><option value="">— Seleccionar —</option><option>Completo sin contraindicaciones</option><option>Implante/dispositivo no verificado</option><option>Marcapasos / metal / claustrofobia</option></select></div>
+    <div id="secPreg" class="hidden"><label>Embarazo / FUR / β-hCG</label><select id="cEmbarazo"><option value="">— Seleccionar —</option><option>No embarazada / no aplica</option><option>Posible embarazo</option><option>Embarazo confirmado</option></select></div>
+    <div id="secPrep" class="hidden"><label>Preparación (ayuno / vejiga)</label><select id="cPrep"><option value="">— Seleccionar —</option><option>Cumplida</option><option>Pendiente</option></select></div>
+    <div id="secCoag" class="hidden"><label>Coagulación / plaquetas</label><input id="cCoag" placeholder="INR, plaquetas"></div>
+    <label>Consentimiento informado</label>
+    <select id="cConsent"><option value="">— Seleccionar —</option><option>Firmado</option><option>No firmado</option><option>No aplica</option></select>
+    <label>Imagen previa</label>
+    <select id="cImagenPrevia"><option value="">—</option><option>Sí</option><option>No</option></select>
+    <label>Evaluaciones de otros servicios</label>
+    <input id="cOtros" placeholder="Interconsultas, notas...">
+    <label>Validación superior</label>
+    <select id="cValidacion"><option value="">— Si aplica —</option><option>No requiere</option><option>Solicitada</option><option>Aprobada</option></select>
+  </div>
+
+  <div id="statusPanel" class="sp sr">
+    <div class="sh" id="statusHead">🔴 ALERTA — Falta Información Crítica</div>
+    <div class="ss" id="statusSub">Completá los campos requeridos.</div>
+    <div class="als" id="alertsList"></div>
+  </div>
+
+  <div class="card"><h3><span class="n">8</span> WhatsApp</h3>
+    <div class="ttabs">
+      <button class="ttab active" data-tpl="service">Modelo servicio</button>
+      <button class="ttab" data-tpl="rich">Enriquecido</button>
+      <button class="ttab" data-tpl="pending">Solo pendientes</button>
+    </div>
+    <textarea id="caseOut" class="out" readonly></textarea>
+    <p class="copy-hint">Si "Copiar" falla en el celular → tocá "Seleccionar" y mantené presionado para copiar.</p>
+    <div class="br3">
+      <button class="btn" onclick="copyOut('caseOut')">📋 Copiar</button>
+      <button class="btn gh" onclick="selOut('caseOut')">🔲 Seleccionar</button>
+      <button class="btn gn" onclick="openWA('caseOut')">💬 WhatsApp</button>
+    </div>
+    <div class="br3">
+      <button class="btn nv" onclick="savePx(true)">💾 Guardar completo</button>
+      <button class="btn nv" onclick="savePx(false)">🕶️ Sin datos</button>
+      <button class="btn gh" onclick="clearCase()">🗑️ Limpiar</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== VOZ ===== -->
+<section id="vVoz" class="view">
+  <div class="card">
+    <div class="card-title">🎙️ Presentación por voz</div>
+    <p class="muted" style="margin-bottom:10px">Dictá o pegá la transcripción. El sistema detecta campos por reglas. <b>Todo requiere revisión.</b></p>
+    <div class="voice-modes" id="voiceModes">
+      <button class="vm active" data-m="paste">Pegar / escribir</button>
+      <button class="vm" data-m="dict">Dictado por voz</button>
+    </div>
+    <div id="vmRecBar" class="hidden">
+      <div id="recIndicator" class="rec-indicator">
+        <span class="rec-dot"></span>
+        <div class="rec-wave"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+        <span class="rec-time" id="recTime">00:00</span>
+      </div>
+      <p class="muted" id="recStatus" style="margin-bottom:8px">Tocá "Iniciar dictado" y hablá. El texto aparece abajo en vivo.</p>
+      <div class="br">
+        <button class="btn pu" id="btnRec" onclick="toggleDictation()">🎙️ Iniciar dictado</button>
+        <button class="btn gh" onclick="stopDictation()">⏹️ Detener</button>
+      </div>
+    </div>
+    <label style="margin-top:10px">Transcripción / texto</label>
+    <textarea id="voiceTxt" rows="5" placeholder="Ej: Urgencias presenta a Mario Pérez, cédula 8-78-1122, 56 años, en sala 4, por dolor en hipocondrio derecho. Solicitan US hepatobiliar para descartar colelitiasis. Creatinina 0.9, sin alergia, ayuno de 6 horas."></textarea>
+    <div class="br3" style="margin-top:8px">
+      <button class="btn pu" onclick="analyzeVoice()">🧠 Analizar</button>
+      <button class="btn gn" onclick="applyVoice()">✅ Aplicar al caso</button>
+      <button class="btn gh" onclick="clearVoice()">🗑️ Limpiar</button>
+    </div>
+  </div>
+  <div class="card" id="voiceResultCard" style="display:none">
+    <div class="card-title">🧩 Campos detectados</div>
+    <table class="voice-table"><thead><tr><th>Campo</th><th>Valor</th><th>Conf.</th><th></th></tr></thead><tbody id="voiceTable"></tbody></table>
+    <div id="voiceMissing" class="miss-list"></div>
+    <div id="voiceQuestions" class="q-list"></div>
+    <div class="div"></div>
+    <div class="card-title" style="font-size:.95rem">📋 Solicitud generada</div>
+    <p class="muted" style="margin-bottom:6px">Vista previa con los datos detectados. Revisá y copiá.</p>
+    <textarea id="voiceOut" class="out" readonly style="min-height:150px"></textarea>
+    <div class="br3" style="margin-top:7px">
+      <button class="btn" onclick="copyOut('voiceOut')">📋 Copiar</button>
+      <button class="btn gh" onclick="selOut('voiceOut')">🔲 Seleccionar</button>
+      <button class="btn gn" onclick="openWA('voiceOut')">💬 WhatsApp</button>
+    </div>
+  </div>
+</section>
+
+<!-- ===== RESÚMENES ===== -->
+<section id="vResumenes" class="view">
+  <div class="card">
+    <div class="card-title">📝 Resúmenes radiológicos</div>
+    <p class="muted" style="margin-bottom:11px">Elegí un paciente y el tipo de resumen. Se autocompleta con lo que ya tenés del reporte y dejás listo lo que falta.</p>
+    <label>1 · Paciente</label>
+    <select id="sumPatient" onchange="pickSummaryPatient()"></select>
+    <label style="margin-top:11px">2 · Tipo de resumen</label>
+    <div id="sumTypeGrid" class="sum-type-grid"></div>
+  </div>
+  <div id="sumFormArea"></div>
+  <div class="card">
+    <div class="card-title" style="font-size:.98rem">🗂️ Resúmenes guardados</div>
+    <div id="sumHistList"></div>
+  </div>
+</section>
+
+<!-- ===== TURNOS ===== -->
+<section id="vTurnos" class="view">
+  <div class="card">
+    <div class="cal-head">
+      <button class="btn gh" onclick="prevMonth()" style="width:auto;padding:7px 13px">‹</button>
+      <h3 id="calTitle" style="margin:0;font-size:1.05rem;color:var(--ink);font-weight:700;font-family:var(--font-head)">—</h3>
+      <button class="btn gh" onclick="nextMonth()" style="width:auto;padding:7px 13px">›</button>
+    </div>
+    <div class="cal-kpis">
+      <div class="ck"><b id="kTurnos">0</b><span>turnos</span></div>
+      <div class="ck"><b id="kPagados">0</b><span>pagados</span></div>
+      <div class="ck"><b id="kFatiga">0</b><span>alertas fatiga</span></div>
+      <div class="ck"><b id="kHoras">0h</b><span>horas turno</span></div>
+    </div>
+    <div class="cal" id="calGrid"></div>
+    <p class="muted" style="margin-top:8px;text-align:center">Tocá un día para elegir su estado. <b style="color:var(--red)">T</b>=turno · <b style="color:#1a6b7a">P</b>=planta · <b style="color:var(--green)">L</b>=libre · <b style="color:#7c3aed">V</b>=vacación · <b style="color:var(--yel)">Fer</b>=feriado. Turno L-V: 15:00–07:00 (16h). Finde/feriado: 07:00–07:00 (24h).</p>
+  </div>
+
+  <div class="day-edit hidden" id="dayEdit">
+    <div class="card-title" id="dayEditTitle">Día seleccionado</div>
+    <p class="muted" style="margin:-2px 0 6px">Elegí el estado del día:</p>
+    <div class="state-grid">
+      <button class="state-btn st-t" id="sbTurno" onclick="setDayKind('turno')">🔴 Turno</button>
+      <button class="state-btn st-l" id="sbLibre" onclick="setDayKind('libre')">🟢 Libre</button>
+      <button class="state-btn st-v" id="sbVac" onclick="setDayKind('vacaciones')">🟣 Vacación</button>
+    </div>
+    <div id="turnoExtra" class="hidden">
+      <div class="g2" style="margin-top:9px">
+        <div><label>Pago del turno</label><select id="dPago" onchange="saveDayQuick()"><option value="N">Pendiente</option><option value="P">Pagado</option><option value="X">No aplica</option></select></div>
+        <div><label>Duración</label><input id="dDur" readonly></div>
+      </div>
+    </div>
+    <label>Notas del día</label><input id="dNotas" placeholder="Observaciones" oninput="saveDayQuick()">
+    <button class="btn gh" style="margin-top:9px" onclick="closeDay()">✕ Cerrar</button>
+  </div>
+
+  <div class="card">
+    <h3>🌴 Vacaciones por rango</h3>
+    <p class="muted" style="margin:-4px 0 6px">Marcá un periodo completo de vacaciones de una vez. Se mostrará la letra <b>V</b> en cada día.</p>
+    <div class="g2">
+      <div><label>Desde</label><input id="vacFrom" type="date"></div>
+      <div><label>Hasta</label><input id="vacTo" type="date"></div>
+    </div>
+    <div class="br">
+      <button class="btn" style="background:#7c3aed" onclick="markVacationRange()">🟣 Marcar vacaciones</button>
+      <button class="btn gh" onclick="clearVacationRange()">Quitar rango</button>
+    </div>
+  </div>
+
+  <div class="shift-summary" id="shiftSummary"></div>
+  <button class="btn gh" style="margin-top:10px;width:auto;padding:8px 13px" onclick="copyShiftSummary()">📋 Copiar resumen mensual</button>
+</section>
+
+<!-- ===== CONFIG ===== -->
+<section id="vConfig" class="view">
+  <div class="cnav">
+    <button class="active" data-mod="mTema">Tema</button>
+    <button data-mod="mHistorial">Historial</button>
+    <button data-mod="mServicios">Servicios</button>
+    <button data-mod="mEstudios">Estudios</button>
+    <button data-mod="mModalidades">Modalidades</button>
+    <button data-mod="mDatos">Datos</button>
+  </div>
+  <div id="mTema" class="mod active">
+    <div class="card">
+      <div class="card-title">🎨 Tema visual</div>
+      <p class="muted">Elegí la apariencia. <b>Nocturno</b> es ideal para guardias de noche.</p>
+      <div class="theme-grid" id="themeGrid"></div>
+    </div>
+  </div>
+  <div id="mHistorial" class="mod">
+    <div class="privacy"><span>🔒</span><div><b>Privacidad:</b> el historial se guarda solo en este dispositivo. "Sin datos" omite nombre y cédula.</div></div>
+    <div id="histList"></div>
+    <button class="btn gh" style="margin-top:5px" onclick="clearHistory()">🗑️ Borrar historial</button>
+  </div>
+  <div id="mServicios" class="mod">
+    <div class="card"><h3>Agregar servicio</h3>
+      <label>Nombre</label><input id="svcName" placeholder="Ej: Cardiología">
+      <label>Tipo</label><input id="svcType" placeholder="Hospitalización, Urgencias...">
+      <button class="btn" style="margin-top:9px" onclick="addSvc()">+ Agregar</button>
+    </div>
+    <div id="svcList"></div>
+  </div>
+  <div id="mEstudios" class="mod">
+    <div class="card"><h3>Agregar estudio</h3>
+      <label>Nombre</label><input id="stName" placeholder="Ej: TC de órbitas">
+      <div class="g2">
+        <div><label>Modalidad</label><select id="stMod"></select></div>
+        <div><label>Región</label><input id="stRegion" placeholder="Cráneo, Abdomen..."></div>
+      </div>
+      <div class="g2">
+        <div><label>¿Contraste?</label><select id="stContrast"><option>No</option><option>Sí (yodado)</option><option>Sí (gadolinio)</option><option>Sí (bario)</option></select></div>
+        <div><label>Prioridad</label><select id="stPri"><option>Alta</option><option>Media</option><option>Baja</option></select></div>
+      </div>
+      <label>Indicaciones</label><textarea id="stInd"></textarea>
+      <div class="div"></div>
+      <label class="collapse-h" onclick="document.getElementById('labReqBuilder').classList.toggle('hidden')"><span>🧪 Laboratorios requeridos (cuadro de requisitos)</span><span>▾</span></label>
+      <div id="labReqBuilder" class="hidden">
+        <p class="muted">Tocá los labs que condicionan este estudio. Si no marcás ninguno, el sistema los sugiere según modalidad y contraste.</p>
+        <div class="labs-grid" id="stLabsGrid"></div>
+      </div>
+      <button class="btn" style="margin-top:11px" onclick="addStudy()">+ Agregar estudio</button>
+    </div>
+    <input id="stFilter" placeholder="🔍 Filtrar estudios..." style="margin-bottom:9px">
+    <div id="studyList"></div>
+  </div>
+  <div id="mModalidades" class="mod">
+    <p class="muted" style="margin-bottom:9px">Tocá una modalidad para ver cuándo usarla, cuándo no, su característica única y contraindicaciones.</p>
+    <div id="modList"></div>
+  </div>
+  <div id="mDatos" class="mod">
+    <div class="card">
+      <div class="card-title">⚙️ Configuración</div>
+      <p class="muted" style="margin-bottom:11px">Exportá servicios, estudios y modalidades para compartir. El historial no se incluye aquí.</p>
+      <div class="br"><button class="btn nv" onclick="exportConfig()">⬇️ Exportar config</button><button class="btn gh" onclick="document.getElementById('impFile').click()">⬆️ Importar config</button></div>
+      <input type="file" id="impFile" accept=".json" class="hidden" onchange="importConfig(event)">
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Exportar pacientes (Excel)</div>
+      <p class="muted" style="margin-bottom:10px">Historial en Excel con diseño y encabezados claros.</p>
+      <label>Período</label>
+      <select id="expRange" onchange="document.getElementById('expDates').classList.toggle('hidden',this.value!=='range')">
+        <option value="all">Toda la data</option>
+        <option value="range">Seleccionar período</option>
+      </select>
+      <div id="expDates" class="g2 hidden" style="margin-top:8px">
+        <div><label>Desde</label><input id="expFrom" type="date"></div>
+        <div><label>Hasta</label><input id="expTo" type="date"></div>
+      </div>
+      <button class="btn gn" style="margin-top:11px" onclick="exportPatientsExcel()">📊 Descargar Excel</button>
+    </div>
+    <div class="card">
+      <button class="btn rd" onclick="resetAll()">♻️ Restaurar fábrica</button>
+      <p class="muted" style="margin-top:6px;text-align:center">El historial y los turnos se conservan.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ===== MANUAL ===== -->
+<section id="vManual" class="view"><div class="card manual" id="manualContent"></div></section>
+
+</div>
+<div id="toast">Copiado</div>
+<nav class="bnav">
+  <button id="nb0" class="active" onclick="goV('vCaso',0)"><span class="ic">🧑‍⚕️</span>Caso</button>
+  <button id="nb1" onclick="goV('vVoz',1)"><span class="ic">🎙️</span>Voz</button>
+  <button id="nb2" onclick="goV('vResumenes',2)"><span class="ic">📝</span>Resúmenes</button>
+  <button id="nb3" onclick="goV('vTurnos',3)"><span class="ic">🕐</span>Turnos</button>
+  <button id="nb4" onclick="goV('vConfig',4)"><span class="ic">⚙️</span>Config</button>
+  <button id="nb5" onclick="goV('vManual',5)"><span class="ic">📖</span>Manual</button>
+</nav>
+<script>/* ====================================================================
+   RADFLOW GUARD — 6 TEMAS DE DISEÑO
+   Diseñados con principios frontend-design: tipografía distintiva,
+   paletas cohesivas, dominante + acento. Optimizados para móvil.
+   Cada tema sobreescribe variables CSS vía body[data-theme].
+   ==================================================================== */
+const THEMES = [
+  {
+    id:'clinico', name:'Clínico', desc:'Refinado, azul petróleo · por defecto', dark:false,
+    swatch:['#0d2e41','#1a6b7a','#c79a3a'],
+    fontHead:"'Fraunces',Georgia,serif", fontBody:"'Inter',-apple-system,sans-serif",
+    vars:{'--navy':'#0d2e41','--teal':'#1a6b7a','--tl':'#4a8a99','--bg':'#f4f6f8','--paper':'#ffffff','--ink':'#16242e','--soft':'#5a6b76','--line':'#dce4e9','--gold':'#c79a3a','--accent':'#1a6b7a'}
+  },
+  {
+    id:'nocturno', name:'Nocturno', desc:'Modo oscuro · ideal para guardia 24h', dark:true,
+    swatch:['#0a0e14','#3b82f6','#22d3ee'],
+    fontHead:"'Space Grotesk',sans-serif", fontBody:"'Inter',-apple-system,sans-serif",
+    vars:{'--navy':'#0f172a','--teal':'#3b82f6','--tl':'#60a5fa','--bg':'#0a0e14','--paper':'#151b26','--ink':'#e8eef5','--soft':'#94a3b8','--line':'#26303f','--gold':'#fbbf24','--accent':'#22d3ee'}
+  },
+  {
+    id:'menta', name:'Menta Clínica', desc:'Verde fresco, calmado', dark:false,
+    swatch:['#0f3d3e','#10b981','#f0a500'],
+    fontHead:"'Fraunces',Georgia,serif", fontBody:"'Inter',-apple-system,sans-serif",
+    vars:{'--navy':'#0f3d3e','--teal':'#0d9488','--tl':'#5eead4','--bg':'#f0f7f5','--paper':'#ffffff','--ink':'#13262320','--soft':'#5a7a72','--line':'#d3e8e2','--gold':'#f0a500','--accent':'#0d9488','--ink':'#15302b'}
+  },
+  {
+    id:'coral', name:'Coral Cálido', desc:'Editorial, energético', dark:false,
+    swatch:['#7c2d2d','#e85d4e','#e8a33d'],
+    fontHead:"'Fraunces',Georgia,serif", fontBody:"'Inter',-apple-system,sans-serif",
+    vars:{'--navy':'#5a1f1f','--teal':'#c44536','--tl':'#e07a5f','--bg':'#faf4ef','--paper':'#fffdfb','--ink':'#2d1810','--soft':'#7a5c52','--line':'#ecddd2','--gold':'#d98e2b','--accent':'#c44536'}
+  },
+  {
+    id:'pizarra', name:'Pizarra', desc:'Minimalista, escala de grises', dark:false,
+    swatch:['#1c1c1e','#52525b','#0ea5e9'],
+    fontHead:"'Space Grotesk',sans-serif", fontBody:"'Inter',-apple-system,sans-serif",
+    vars:{'--navy':'#1c1c1e','--teal':'#3f3f46','--tl':'#71717a','--bg':'#fafafa','--paper':'#ffffff','--ink':'#18181b','--soft':'#71717a','--line':'#e4e4e7','--gold':'#0ea5e9','--accent':'#0ea5e9'}
+  },
+  {
+    id:'indigo', name:'Índigo', desc:'Profundo, moderno', dark:false,
+    swatch:['#312e81','#6366f1','#f59e0b'],
+    fontHead:"'Space Grotesk',sans-serif", fontBody:"'Inter',-apple-system,sans-serif",
+    vars:{'--navy':'#312e81','--teal':'#4f46e5','--tl':'#818cf8','--bg':'#f5f5fb','--paper':'#ffffff','--ink':'#1e1b3a','--soft':'#6b6890','--line':'#e0e0f0','--gold':'#f59e0b','--accent':'#4f46e5'}
+  }
+];
+
+function applyTheme(id){
+  const t=THEMES.find(x=>x.id===id)||THEMES[0];
+  const root=document.documentElement;
+  Object.entries(t.vars).forEach(([k,v])=>root.style.setProperty(k,v));
+  document.body.setAttribute('data-theme',t.id);
+  document.body.dataset.dark=t.dark?'1':'0';
+  // fuentes
+  root.style.setProperty('--font-head',t.fontHead);
+  root.style.setProperty('--font-body',t.fontBody);
+  // meta theme-color
+  const meta=document.querySelector('meta[name=theme-color]');if(meta)meta.content=t.vars['--navy'];
+}
+</script>
+<script>/* ====================================================================
+   RADFLOW GUARD v3 — CATÁLOGO DE DATOS
+   Requisitos, modalidades y estudios con prerrequisitos investigados
+   (basado en guías ACR, ESUR y protocolos hospitalarios estándar)
+   ==================================================================== */
+
+/* ---------- CATÁLOGO DE REQUISITOS (cada uno: [etiqueta, nivel, explicación]) ---------- */
+const REQ = {
+  // Universales
+  medico_presenta:['Médico que presenta','red','Necesario para devolver preguntas y dar seguimiento a la solicitud.'],
+  extension:['Extensión / contacto','red','Sin contacto no se pueden aclarar pendientes ni reportar.'],
+  paciente:['Paciente identificado','red','Nombre/cédula reducen el riesgo administrativo y de identificación.'],
+  edad:['Edad','red','Crítica para protocolos, dosis y diferenciales (sobre todo pediatría).'],
+  ubicacion:['Ubicación','red','Necesaria para traslado y coordinación logística.'],
+  motivo:['Motivo de consulta','red','Sin motivo no se puede justificar ni protocolizar el estudio.'],
+  sospecha:['Patología a descartar','red','Determina protocolo, modalidad, fases y prioridad.'],
+  // Contraste yodado
+  alergia_contraste:['Alergia a contraste documentada','red','Obligatorio antes de cualquier estudio con contraste yodado.'],
+  creatinina:['Creatinina / eGFR','red','Seguridad renal. Hospitalizados: <1 semana. Ambulatorios de riesgo (>60a, DM, HTA, ERC).'],
+  canalizacion:['Canalización / acceso venoso','red','Necesaria para administrar contraste IV.'],
+  via_antecubital:['Vía antecubital de buen calibre','orange','Para AngioTC se prefiere 18-20G en antecubital por el bolo a alta velocidad.'],
+  premedicacion:['Premedicación si alergia previa','black','Alergia moderada/severa previa requiere esquema y validación.'],
+  // RM
+  rm_safety:['Tamizaje de seguridad RM','red','Marcapasos, clips, implantes, metal intraocular, claustrofobia.'],
+  implante_rm:['Implante/dispositivo RM no verificado','black','No ingresar a RM hasta confirmar compatibilidad.'],
+  gadolinio_renal:['Función renal para gadolinio','orange','Si ERC/eGFR bajo, evaluar riesgo de fibrosis sistémica nefrogénica.'],
+  // Preparación
+  ayuno:['Ayuno','orange','US hepatobiliar/abdomen y algunos baritados requieren 4-6h de ayuno.'],
+  vejiga_llena:['Vejiga llena','orange','US pélvico/renal suprapúbico: tomar agua y no orinar antes.'],
+  vejiga_vacia:['Vejiga vacía','yellow','US transvaginal: orinar antes del estudio.'],
+  enema:['Preparación intestinal / enema','orange','Algunos estudios de pelvis o colon requieren limpieza.'],
+  // Sospecha-específicos
+  dimero_d:['Dímero D','yellow','Apoya la sospecha de TEP antes de AngioTC pulmonar.'],
+  rx_torax_previo:['Rx tórax reciente','yellow','Útil como comparación/diferencial en disnea o TEP.'],
+  signos_vitales:['Signos vitales / estabilidad','red','Esencial en urgencias, trauma y traslados.'],
+  anticoagulacion:['Estado de anticoagulación','yellow','Relevante en trauma, ictus, TVP, sangrado e intervencionismo.'],
+  glicemia:['Glicemia','yellow','En código ictus se descarta hipoglucemia como simulador.'],
+  hora_inicio:['Hora de inicio de síntomas','orange','Define ventana terapéutica en ictus.'],
+  // Seguridad
+  embarazo:['Estado de embarazo','black','Mujer en edad fértil + radiación/contraste: confirmar y valorar.'],
+  peso_pediatrico:['Peso (pediátrico)','orange','Necesario para dosis y protocolo en niños.'],
+  sedacion:['Plan de sedación','black','Pediátrico/no colaborador puede requerir sedación coordinada.'],
+  paciente_inestable:['Estabilidad del paciente','black','Inestable/crítico: validación, monitor y acompañamiento.'],
+  aislamiento:['Estado de aislamiento','yellow','Coordinar si el paciente requiere precauciones de contacto.'],
+  consentimiento:['Consentimiento informado','red','Obligatorio en intervencionismo y estudios invasivos; recomendable en contraste.'],
+  coagulacion:['Pruebas de coagulación / plaquetas','red','Antes de procedimientos invasivos (INR, plaquetas).'],
+  ayuno_sedacion:['Ayuno para sedación','orange','Si requiere sedación/anestesia, respetar ayuno.']
+};
+
+/* ---------- MODALIDADES (didácticas) ---------- */
+const SEED_MODALITIES = [
+  {name:'Radiografía (Rx)', ion:'Sí (baja dosis)', nature:'Imagen estática 2D por rayos X',
+   desc:'La más usada, rápida y barata. Primera línea para fracturas, tórax y abdomen agudo.',
+   when:'Fracturas y trauma óseo. Tórax: neumonía, ICC, neumotórax, derrame. Abdomen: obstrucción, perforación (aire libre). Control de tubos, sondas y catéteres.',
+   whenNot:'Mala resolución de partes blandas. No sirve para caracterizar masas, evaluar médula/cerebro ni lesiones ligamentarias.',
+   unique:'Disponible, portátil y de muy baja dosis. Ideal como primer filtro y para seguimiento de líneas/dispositivos.',
+   contra:'Sin contraindicación absoluta. En embarazo, proteger con delantal plomado y justificar.',
+   prep:'Ninguna especial. Retirar objetos metálicos del área a estudiar.'},
+
+  {name:'Fluoroscopia', ion:'Sí (puede ser alta)', nature:'Rayos X en tiempo real (video)',
+   desc:'Rayos X continuos que muestran movimiento y función en vivo.',
+   when:'Estudios dinámicos del tubo digestivo (esofagograma, SGD, tránsito, colon por enema), cistouretrografía miccional, histerosalpingografía y guía de procedimientos.',
+   whenNot:'Si se sospecha perforación, NO usar bario (usar contraste hidrosoluble). Evitar en embarazo.',
+   unique:'Muestra movimiento y función en tiempo real, no solo anatomía estática.',
+   contra:'Embarazo. Bario contraindicado si hay sospecha de perforación o riesgo de aspiración.',
+   prep:'Ayuno para estudios del tracto superior. Preparación intestinal para colon por enema.'},
+
+  {name:'TC (Tomografía)', ion:'Sí (dosis moderada-alta)', nature:'Cortes transversales por rayos X',
+   desc:'Cortes detallados y multiplanares. Rápida, ideal en urgencias.',
+   when:'Primera línea en urgencias para dolor torácico/abdominal. Trauma y politrauma. Ictus (TC simple descarta hemorragia). TEP (AngioTC). Litiasis (KUB). Caracterización pulmonar y estadificación.',
+   whenNot:'Cuando la RM es superior (partes blandas, médula, caracterización hepática) y hay tiempo. Evitar contraste si alergia a yodo o eGFR <30.',
+   unique:'Muy rápida (segundos), excelente para hueso, pulmón y sangrado agudo. Reconstrucciones multiplanares y 3D.',
+   contra:'Embarazo (radiación, evitar si hay alternativa). Contraste yodado: alergia documentada, ERC severa (eGFR <30). Suspender metformina 48h tras contraste si función renal alterada.',
+   prep:'Ayuno 4-6h si lleva contraste. Verificar creatinina/eGFR y alergias. Canalización para contraste IV.'},
+
+  {name:'Ultrasonido (US)', ion:'No', nature:'Ondas sonoras, tiempo real',
+   desc:'Sin radiación, en tiempo real, operador-dependiente.',
+   when:'Primera línea en niños y embarazadas. Abdomen (vesícula, hígado, riñón), pelvis, obstetricia, tiroides, partes blandas/MSK, escroto. Guía de punciones y drenajes.',
+   whenNot:'Limitado por gas intestinal, aire pulmonar y hueso. Difícil en pacientes con obesidad marcada. No evalúa bien estructuras profundas o retroperitoneo.',
+   unique:'Sin radiación, repetible, portátil y barato. Permite evaluación dinámica y a pie de cama. Doppler valora flujo.',
+   contra:'Ninguna absoluta. Es la modalidad más segura.',
+   prep:'Ayuno 6-8h para hepatobiliar (mejor distensión vesicular). Vejiga llena para pélvico/suprapúbico; vacía para transvaginal.'},
+
+  {name:'Doppler', ion:'No', nature:'US de flujo vascular',
+   desc:'Variante del ultrasonido que evalúa flujo sanguíneo (dirección y velocidad).',
+   when:'TVP (venoso MMII), estenosis carotídea, isquemia arterial periférica, torsión testicular, flujo portal/hepático e injertos.',
+   whenNot:'Operador y ángulo-dependiente. Limitado en edema importante, gas o calcificación vascular extensa.',
+   unique:'Único en mostrar dirección, velocidad y características del flujo sin radiación ni contraste.',
+   contra:'Ninguna absoluta.',
+   prep:'Ayuno para Doppler de arterias renales/mesentéricas (reduce gas). El resto no requiere preparación.'},
+
+  {name:'RM (Resonancia)', ion:'No', nature:'Campo magnético + radiofrecuencia',
+   desc:'El mejor contraste de partes blandas, sin radiación. Estudio largo.',
+   when:'Cerebro y médula. MSK (ligamentos, meniscos, médula ósea). Caracterización hepática y de masas. Pelvis y próstata (multiparamétrica). MRCP para coledocolitiasis (cálculos no calcificados). Mama de alto riesgo.',
+   whenNot:'Urgencia con paciente inestable (es lenta). Mala para hueso cortical y cálculos calcificados. Claustrofobia severa.',
+   unique:'Contraste de partes blandas insuperable, multiparamétrico y sin radiación. Secuencias funcionales (difusión, perfusión).',
+   contra:'Marcapasos/DAI no compatibles, clips de aneurisma ferromagnéticos, metal intraocular, algunos implantes cocleares. Claustrofobia severa. Gadolinio: ERC severa (riesgo de fibrosis sistémica nefrogénica) y precaución en embarazo.',
+   prep:'Tamizaje de seguridad obligatorio (metal/implantes). Ayuno para abdomen/MRCP. Retirar todo objeto metálico. Sedación si claustrofobia o no colabora.'},
+
+  {name:'Medicina nuclear / PET', ion:'Sí (radiofármaco)', nature:'Imagen funcional/molecular',
+   desc:'Usa radiofármacos para mostrar función y metabolismo, no solo anatomía.',
+   when:'Metástasis óseas (gammagrafía ósea). Estadificación oncológica y respuesta (PET-FDG). Función renal diferencial (DMSA/MAG3). TEP cuando la AngioTC está contraindicada (V/Q).',
+   whenNot:'Cuando se necesita detalle anatómico fino. Embarazo y lactancia (relativo).',
+   unique:'Imagen funcional/metabólica: detecta actividad de enfermedad antes que aparezca el cambio anatómico.',
+   contra:'Embarazo. Lactancia (suspender según radiofármaco). PET-FDG: hiperglucemia descontrolada reduce la calidad.',
+   prep:'PET-FDG: ayuno 4-6h y glicemia controlada. Hidratación. Suspender lactancia el tiempo indicado.'},
+
+  {name:'Intervencionismo', ion:'Variable', nature:'Procedimientos guiados por imagen',
+   desc:'Procedimientos mínimamente invasivos guiados por imagen (diagnósticos y terapéuticos).',
+   when:'Biopsias, drenaje de abscesos/colecciones, accesos vasculares (PICC), nefrostomía percutánea, todo bajo guía de US/TC/fluoroscopia.',
+   whenNot:'Coagulopatía no corregida. Falta de consentimiento informado. Paciente que no colabora sin opción de sedación.',
+   unique:'Combina diagnóstico y tratamiento en un mismo acto, mínimamente invasivo, con recuperación rápida.',
+   contra:'INR elevado / plaquetopenia no corregida. Sin consentimiento. Inestabilidad sin soporte.',
+   prep:'Coagulación (INR, plaquetas), consentimiento informado firmado, ayuno si requiere sedación, acceso venoso.'}
+];
+
+/* ---------- HELPER para armar estudios ---------- */
+const U = ['medico_presenta','extension','paciente','edad','ubicacion','motivo','sospecha']; // universales
+function S(name, modality, region, contrast, priority, ind, extra){
+  return {name, modality, region, contrast, priority, ind, reqs:U.concat(extra||[])};
+}
+
+/* ---------- CATÁLOGO DE ESTUDIOS (60+) ---------- */
+const SEED_STUDIES = [
+
+  /* ============ RADIOGRAFÍA ============ */
+  S('Rx tórax (PA y lateral)','Radiografía (Rx)','Tórax','No','Alta','Disnea, fiebre, tos, dolor torácico, control de vías/sondas, neumonía.'),
+  S('Rx tórax portátil','Radiografía (Rx)','Tórax','No','Alta','Paciente que no se traslada (UCI, crítico). Control de tubos y catéteres.',['signos_vitales']),
+  S('Rx abdomen simple (de pie y decúbito)','Radiografía (Rx)','Abdomen','No','Alta','Obstrucción intestinal, perforación (aire libre), cuerpo extraño, litiasis radiopaca.'),
+  S('Rx abdomen (sospecha de NEC, pediátrico)','Radiografía (Rx)','Abdomen','No','Alta','Prematuro con distensión, sospecha de enterocolitis necrotizante (neumatosis, aire portal).',['peso_pediatrico']),
+  S('Rx columna cervical','Radiografía (Rx)','Columna','No','Alta','Trauma cervical, dolor, evaluación de alineación.',['signos_vitales']),
+  S('Rx columna dorsolumbar','Radiografía (Rx)','Columna','No','Media','Dolor lumbar, trauma, fractura por compresión, control.'),
+  S('Rx pelvis','Radiografía (Rx)','Pelvis','No','Alta','Trauma, dolor de cadera, fractura, evaluación articular.'),
+  S('Rx extremidad (trauma óseo)','Radiografía (Rx)','Variable','No','Alta','Sospecha de fractura o luxación. Indicar lado y región.'),
+  S('Rx cráneo','Radiografía (Rx)','Cráneo','No','Baja','Cuerpo extraño, lesiones óseas, valoración limitada (la TC es superior en trauma).'),
+  S('Rx partes blandas cuello (lateral)','Radiografía (Rx)','Cuello','No','Alta','Epiglotitis ("thumb sign"), crup ("steeple"), adenoides, cuerpo extraño.',['peso_pediatrico']),
+  S('Rx senos paranasales','Radiografía (Rx)','Cabeza','No','Baja','Sinusitis (limitada; la TC es de elección).'),
+
+  /* ============ FLUOROSCOPIA ============ */
+  S('Esofagograma (trago de bario)','Fluoroscopia','Esófago','Sí (bario)','Media','Disfagia, acalasia, estenosis, divertículos, fístula. Riesgo de aspiración: valorar contraste hidrosoluble.',['ayuno']),
+  S('Serie esófago-gastroduodenal (SGD)','Fluoroscopia','GI superior','Sí (bario)','Media','Úlcera, masa, obstrucción de salida gástrica, control postquirúrgico.',['ayuno']),
+  S('Tránsito intestinal','Fluoroscopia','Intestino delgado','Sí (bario)','Baja','Evaluación de intestino delgado, obstrucción parcial, Crohn.',['ayuno']),
+  S('Colon por enema','Fluoroscopia','Colon','Sí (bario)','Baja','Estenosis, masa, vólvulo, evaluación de colon. Requiere preparación intestinal.',['enema']),
+  S('Cistouretrografía miccional (CUMS)','Fluoroscopia','Vía urinaria','Sí (yodado)','Media','Reflujo vesicoureteral, valoración uretral. Frecuente en pediatría.',['peso_pediatrico']),
+  S('Histerosalpingografía (HSG)','Fluoroscopia','Pelvis (útero/trompas)','Sí (yodado)','Baja','Estudio de permeabilidad tubárica e infertilidad. Programar días 7-10 del ciclo.',['embarazo']),
+
+  /* ============ TC ============ */
+  S('TC cráneo simple','TC (Tomografía)','Cráneo','No','Alta','Trauma, ictus, cefalea súbita, déficit, hemorragia, deterioro de conciencia.',['signos_vitales','anticoagulacion']),
+  S('TC cráneo contrastada','TC (Tomografía)','Cráneo','Sí (yodado)','Media','Sospecha de tumor, absceso, metástasis tras la fase simple.',['alergia_contraste','creatinina','canalizacion']),
+  S('AngioTC cerebral','TC (Tomografía)','Cráneo/Cuello','Sí (yodado)','Alta','Código ictus, oclusión de gran vaso, aneurisma, disección.',['alergia_contraste','creatinina','canalizacion','signos_vitales','hora_inicio']),
+  S('TC perfusión cerebral','TC (Tomografía)','Cráneo','Sí (yodado)','Alta','Selección de ictus para reperfusión (núcleo/penumbra).',['alergia_contraste','creatinina','canalizacion','hora_inicio']),
+  S('TC senos paranasales','TC (Tomografía)','Cabeza','No','Baja','Sinusitis crónica, valoración prequirúrgica, complicaciones.'),
+  S('TC cuello contrastada','TC (Tomografía)','Cuello','Sí (yodado)','Media','Absceso, masa, adenopatías, valoración de vía aérea.',['alergia_contraste','creatinina','canalizacion']),
+  S('TC tórax simple','TC (Tomografía)','Tórax','No','Media','Nódulo pulmonar, intersticial (HRCT), control oncológico sin contraste.'),
+  S('TC tórax contrastada','TC (Tomografía)','Tórax','Sí (yodado)','Media','Masa mediastinal, estadificación, adenopatías, vascular.',['alergia_contraste','creatinina','canalizacion']),
+  S('AngioTC pulmonar (TEP)','TC (Tomografía)','Tórax','Sí (yodado)','Alta','Sospecha de tromboembolismo pulmonar.',['alergia_contraste','creatinina','canalizacion','via_antecubital','dimero_d','rx_torax_previo','signos_vitales']),
+  S('TC abdomen/pelvis simple','TC (Tomografía)','Abdomen/Pelvis','No','Media','Litiasis, control, cuando el contraste está contraindicado.'),
+  S('TC abdomen/pelvis contrastada','TC (Tomografía)','Abdomen/Pelvis','Sí (yodado)','Alta','Dolor abdominal, sepsis, absceso, estadificación, postquirúrgico.',['alergia_contraste','creatinina','canalizacion']),
+  S('TC abdomen trifásico (hígado)','TC (Tomografía)','Abdomen','Sí (yodado)','Media','Caracterización de lesión hepática (HCC, hemangioma, metástasis).',['alergia_contraste','creatinina','canalizacion']),
+  S('UroTC','TC (Tomografía)','Abdomen/Pelvis','Sí (yodado)','Media','Hematuria, tumor urotelial, anomalías de vía urinaria.',['alergia_contraste','creatinina','canalizacion']),
+  S('TC KUB / litiasis (sin contraste)','TC (Tomografía)','Abdomen','No','Alta','Cólico renal, hematuria, sospecha de litiasis.'),
+  S('AngioTC de aorta','TC (Tomografía)','Tórax/Abdomen','Sí (yodado)','Alta','Disección, aneurisma, ruptura aórtica.',['alergia_contraste','creatinina','canalizacion','via_antecubital','signos_vitales','paciente_inestable']),
+  S('TC columna','TC (Tomografía)','Columna','No','Media','Trauma, fractura, valoración ósea detallada.',['signos_vitales']),
+  S('TC trauma / politrauma (body)','TC (Tomografía)','Cuerpo completo','Sí (yodado)','Alta','Politraumatizado, trauma mayor de alta energía.',['alergia_contraste','creatinina','canalizacion','signos_vitales','paciente_inestable']),
+  S('TC articular / extremidad','TC (Tomografía)','Variable','No','Baja','Fractura compleja, valoración prequirúrgica articular.'),
+
+  /* ============ ULTRASONIDO ============ */
+  S('US abdomen completo','Ultrasonido (US)','Abdomen','No','Media','Dolor abdominal, valoración general de órganos sólidos.',['ayuno']),
+  S('US hepatobiliar','Ultrasonido (US)','Abdomen','No','Alta','Dolor HCD, colelitiasis, colecistitis, ictericia, PFH alteradas.',['ayuno']),
+  S('US renal / vías urinarias','Ultrasonido (US)','Abdomen','No','Media','Hidronefrosis, litiasis, ERC, hematuria.'),
+  S('US pélvico (transabdominal)','Ultrasonido (US)','Pelvis','No','Media','Dolor pélvico, masa, valoración ginecológica inicial.',['vejiga_llena']),
+  S('US transvaginal','Ultrasonido (US)','Pelvis','No','Media','Valoración detallada de útero y ovarios, embarazo temprano.',['vejiga_vacia']),
+  S('US obstétrico','Ultrasonido (US)','Pelvis/Obstétrico','No','Alta','Control de embarazo, viabilidad, crecimiento, bienestar fetal.'),
+  S('US tiroides / cuello','Ultrasonido (US)','Cuello','No','Media','Nódulo tiroideo (TI-RADS), adenopatías, masa cervical.'),
+  S('US partes blandas','Ultrasonido (US)','Variable','No','Baja','Colección, absceso, masa superficial, cuerpo extraño.'),
+  S('US testicular Doppler','Doppler','Escroto','No','Alta','Dolor escrotal agudo, sospecha de torsión, masa, trauma.',['signos_vitales']),
+  S('US mama','Ultrasonido (US)','Mama','No','Media','Masa palpable, complemento de mamografía, mama densa, BI-RADS.'),
+  S('US transfontanelar (pediátrico)','Ultrasonido (US)','Cráneo neonatal','No','Alta','Neonato/lactante: hemorragia matriz germinal, hidrocefalia, LPV.',['peso_pediatrico']),
+  S('US píloro (pediátrico)','Ultrasonido (US)','Abdomen','No','Media','Lactante con vómito en proyectil, sospecha de estenosis pilórica.',['peso_pediatrico']),
+  S('US invaginación (pediátrico)','Ultrasonido (US)','Abdomen','No','Alta','Lactante con dolor cólico, masa, sangre en heces ("jalea de grosella").',['peso_pediatrico']),
+  S('US apendicular','Ultrasonido (US)','Abdomen','No','Alta','Sospecha de apendicitis (1ª línea en niños y embarazadas).'),
+  S('US Doppler abdominal / hepático','Doppler','Abdomen','No','Media','Trombosis portal, evaluación de flujo hepático, TIPS.',['ayuno']),
+  S('FAST (trauma)','Ultrasonido (US)','Abdomen/Tórax','No','Alta','Trauma: líquido libre, hemoperitoneo, derrame pericárdico.',['signos_vitales','paciente_inestable']),
+
+  /* ============ DOPPLER ============ */
+  S('Doppler venoso MMII (TVP)','Doppler','MMII','No','Alta','Edema, dolor de pierna, sospecha de trombosis venosa profunda.',['anticoagulacion']),
+  S('Doppler arterial MMII','Doppler','MMII','No','Media','Claudicación, isquemia, evaluación de pulsos, pie diabético.'),
+  S('Doppler carotídeo','Doppler','Cuello','No','Media','Soplo, AIT/ictus, estenosis carotídea, control.'),
+  S('Doppler renal','Doppler','Abdomen','No','Media','HTA renovascular, estenosis de arteria renal, valoración de injerto.',['ayuno']),
+
+  /* ============ RM ============ */
+  S('RM cerebro simple','RM (Resonancia)','Cráneo','No','Media','Ictus subagudo, tumor, EM, epilepsia, valoración estructural.',['rm_safety']),
+  S('RM cerebro contrastada','RM (Resonancia)','Cráneo','Sí (gadolinio)','Media','Tumor, metástasis, infección, realce de lesiones.',['rm_safety','gadolinio_renal','canalizacion']),
+  S('AngioRM cerebral','RM (Resonancia)','Cráneo','No','Media','Aneurisma, malformación vascular sin radiación.',['rm_safety']),
+  S('RM columna cervical','RM (Resonancia)','Columna','No','Media','Mielopatía, hernia, compresión, lesión medular.',['rm_safety']),
+  S('RM columna dorsolumbar','RM (Resonancia)','Columna','No','Media','Lumbociática, hernia, estenosis, espondilodiscitis, metástasis.',['rm_safety']),
+  S('RM abdomen','RM (Resonancia)','Abdomen','Sí (gadolinio)','Media','Caracterización hepática, masa, valoración de órganos.',['rm_safety','gadolinio_renal','canalizacion','ayuno']),
+  S('ColangioRM (CPRM)','RM (Resonancia)','Abdomen','No','Media','Coledocolitiasis, estenosis biliar, valoración pancreática.',['rm_safety','ayuno']),
+  S('RM pelvis','RM (Resonancia)','Pelvis','Sí (gadolinio)','Media','Estadificación, endometriosis, masa anexial, recto.',['rm_safety','gadolinio_renal','canalizacion']),
+  S('RM próstata multiparamétrica','RM (Resonancia)','Pelvis','Sí (gadolinio)','Media','Cáncer de próstata (PI-RADS), estadificación.',['rm_safety','gadolinio_renal','canalizacion','enema']),
+  S('RM mama','RM (Resonancia)','Mama','Sí (gadolinio)','Media','Alto riesgo, estadificación, evaluación de implantes. Programar días 7-10 del ciclo.',['rm_safety','gadolinio_renal','canalizacion']),
+  S('RM articular / MSK','RM (Resonancia)','Variable','No','Media','Lesión ligamentaria, meniscal, edema óseo, tumor de partes blandas.',['rm_safety']),
+  S('RM cardíaca','RM (Resonancia)','Tórax','Sí (gadolinio)','Media','Miocardiopatía, viabilidad, miocarditis, masa.',['rm_safety','gadolinio_renal','canalizacion']),
+
+  /* ============ MEDICINA NUCLEAR / PET ============ */
+  S('Gammagrafía ósea','Medicina nuclear / PET','Cuerpo completo','Sí (radiofármaco)','Media','Metástasis óseas, osteomielitis, dolor óseo inexplicado.',['embarazo']),
+  S('PET-CT con FDG','Medicina nuclear / PET','Cuerpo completo','Sí (radiofármaco)','Media','Estadificación oncológica, respuesta a tratamiento, recurrencia.',['glicemia','embarazo','ayuno']),
+  S('Centellograma renal (DMSA/MAG3)','Medicina nuclear / PET','Abdomen','Sí (radiofármaco)','Baja','Función renal diferencial, cicatrices, obstrucción.',['embarazo']),
+  S('Gammagrafía V/Q pulmonar','Medicina nuclear / PET','Tórax','Sí (radiofármaco)','Media','TEP cuando la AngioTC está contraindicada (alergia, ERC, embarazo).',['embarazo','rx_torax_previo']),
+
+  /* ============ INTERVENCIONISMO ============ */
+  S('Biopsia guiada (TC/US)','Intervencionismo','Variable','Variable','Media','Toma de muestra de masa o lesión bajo guía de imagen.',['consentimiento','coagulacion','anticoagulacion','ayuno_sedacion']),
+  S('Drenaje percutáneo','Intervencionismo','Variable','Variable','Alta','Drenaje de absceso o colección guiado por imagen.',['consentimiento','coagulacion','anticoagulacion','signos_vitales']),
+  S('Colocación de catéter central (PICC)','Intervencionismo','Vascular','No','Media','Acceso venoso central de larga duración guiado por imagen.',['consentimiento','coagulacion']),
+  S('Nefrostomía percutánea','Intervencionismo','Abdomen','Variable','Alta','Derivación urinaria en obstrucción con hidronefrosis.',['consentimiento','coagulacion','anticoagulacion','signos_vitales'])
+];
+
+/* ====================================================================
+   LABS REQUERIDOS POR ESTUDIO (condicionales — para cuadro de requisitos)
+   Basado en ACR Manual on Contrast Media 2021, ESUR, protocolos estándar.
+   cond: 'always' | 'mujer' (edad fértil) | 'hosp' (hospitalizado)
+   ==================================================================== */
+function studyLabReqs(study){
+  if(study.labReqs&&study.labReqs.length)return study.labReqs; // override manual desde Config
+  const reqs=[];
+  const cont=(study.contrast||'');
+  const yod=/yodado|bario/i.test(cont);
+  const gd=/gadolinio/i.test(cont);
+  const mod=(study.modality||'').toLowerCase();
+  const txt=((study.name||'')+' '+(study.region||'')+' '+(study.ind||'')).toLowerCase();
+  const add=(lab,cond,level,note)=>reqs.push({lab,cond,level,note});
+
+  // Contraste yodado (TC/Angio/Uro)
+  if(yod){
+    add('cre','always','red','eGFR/creatinina antes de contraste yodado. Hospitalizados: <1 sem. Ambulatorios: >60a, DM, HTA o ERC.');
+    add('bhcg','mujer','orange','Descartar embarazo en mujer en edad fértil antes de radiación + contraste.');
+  }
+  // Gadolinio (RM con contraste)
+  if(gd){
+    add('cre','always','orange','Función renal para gadolinio (riesgo de fibrosis sistémica nefrogénica si ERC).');
+    add('bhcg','mujer','yellow','Valorar embarazo antes de gadolinio.');
+  }
+  // TEP
+  if(/tep|embol/i.test(txt)){
+    add('dim','always','yellow','Dímero D apoya la indicación de AngioTC por TEP.');
+  }
+  // Hepatobiliar
+  if(/hepatobiliar|colangio|biliar|vesic|ictericia|colecist/i.test(txt)){
+    add('bt','always','orange','Bilirrubinas — patrón colestásico/ictericia.');
+    add('ast','always','yellow','Transaminasa — daño hepatocelular.');
+    add('alt','always','yellow','Transaminasa — daño hepatocelular.');
+  }
+  // Pancreático
+  if(/pancrea/i.test(txt)){
+    add('lip','always','orange','Lipasa — diagnóstico de pancreatitis.');
+    add('ami','always','yellow','Amilasa — apoya pancreatitis.');
+  }
+  // Renal / litiasis / urinario
+  if(/\brenal\b|urolitiasis|nefrolitiasis|litiasis renal|\bkub\b|urinari|hematuria|pielonefritis|hidronefrosis/i.test(txt) && !/colelitiasis|biliar|hepatobiliar/i.test(txt)){
+    add('cre','always','orange','Creatinina — función renal basal.');
+    add('ua','always','yellow','Uroanálisis — hematuria, infección.');
+  }
+  // Intervencionismo / invasivo
+  if(/intervencion|biopsia|drenaje|nefrostom|cat[eé]ter/i.test(txt+mod)){
+    add('inr','always','red','INR/TP antes de procedimiento invasivo.');
+    add('plaq','always','red','Plaquetas — riesgo de sangrado (>50,000).');
+  }
+  // Trauma / sangrado
+  if(/trauma|politrauma|panscan|sangrad|hemorrag/i.test(txt)){
+    add('hb','always','orange','Hemoglobina — sangrado / anemia.');
+  }
+  // Sepsis / infección abdominal
+  if(/sepsis|absceso|apendicitis|diverticulitis|infecci/i.test(txt)){
+    add('leu','always','yellow','Leucocitos — respuesta inflamatoria/infección.');
+  }
+  return reqs;
+}
+</script>
+<script>/* ====================================================================
+   RADFLOW GUARD — LABS (con unidades) + FERIADOS PANAMÁ
+   ==================================================================== */
+const LABS = [
+  {id:'leu',  ab:'Leu',      full:'Leucocitos',                 unit:'10³/µL', grp:'Hemograma'},
+  {id:'neu',  ab:'Neu',      full:'Neutrófilos',                unit:'%',      grp:'Hemograma'},
+  {id:'hb',   ab:'Hb',       full:'Hemoglobina',                unit:'g/dL',   grp:'Hemograma'},
+  {id:'plaq', ab:'Plaq',     full:'Plaquetas',                  unit:'10³/µL', grp:'Hemograma'},
+  {id:'cre',  ab:'Cre',      full:'Creatinina',                 unit:'mg/dL',  grp:'Renal'},
+  {id:'bun',  ab:'BUN',      full:'Nitrógeno ureico',           unit:'mg/dL',  grp:'Renal'},
+  {id:'egfr', ab:'eGFR',     full:'Filtración glomerular',      unit:'mL/min', grp:'Renal'},
+  {id:'ast',  ab:'AST',      full:'AST / TGO',                  unit:'U/L',    grp:'Hepático'},
+  {id:'alt',  ab:'ALT',      full:'ALT / TGP',                  unit:'U/L',    grp:'Hepático'},
+  {id:'bt',   ab:'BT',       full:'Bilirrubinas totales',       unit:'mg/dL',  grp:'Hepático'},
+  {id:'pfh',  ab:'PFH',      full:'Función hepática',           unit:'',       grp:'Hepático'},
+  {id:'ami',  ab:'Ami',      full:'Amilasa',                    unit:'U/L',    grp:'Pancreático'},
+  {id:'lip',  ab:'Lip',      full:'Lipasa',                     unit:'U/L',    grp:'Pancreático'},
+  {id:'troi', ab:'Tro I',    full:'Troponina I',                unit:'ng/mL',  grp:'Cardíaco'},
+  {id:'mio',  ab:'Mio',      full:'Mioglobina',                 unit:'ng/mL',  grp:'Cardíaco'},
+  {id:'ckmb', ab:'CK-MB',    full:'CK-MB',                      unit:'ng/mL',  grp:'Cardíaco'},
+  {id:'inr',  ab:'INR',      full:'INR / TP',                   unit:'',       grp:'Coagulación'},
+  {id:'tpt',  ab:'TPT',      full:'Tiempo parcial tromboplast.',unit:'seg',    grp:'Coagulación'},
+  {id:'dim',  ab:'Dímero D', full:'Dímero D',                   unit:'µg/mL',  grp:'TEP / Vascular'},
+  {id:'pcr',  ab:'PCR',      full:'Proteína C reactiva',        unit:'mg/L',   grp:'Infección'},
+  {id:'pct',  ab:'PCT',      full:'Procalcitonina',             unit:'ng/mL',  grp:'Infección'},
+  {id:'bhcg', ab:'β-hCG',    full:'Beta-hCG',                   unit:'mIU/mL', grp:'Gineco/Obs'},
+  {id:'ua',   ab:'UA',       full:'Uroanálisis',                unit:'',       grp:'Orina'},
+  {id:'glu',  ab:'Glu',      full:'Glucosa',                    unit:'mg/dL',  grp:'Metabólico'},
+  {id:'na',   ab:'Na',       full:'Sodio',                      unit:'mEq/L',  grp:'Metabólico'},
+  {id:'k',    ab:'K',        full:'Potasio',                    unit:'mEq/L',  grp:'Metabólico'},
+];
+
+/* Panel triage: al tocarlo, despliega estos labs para llenar valores */
+const PANEL_COMPONENTS = ['leu','neu','hb','plaq','cre','bun','glu'];
+
+const PANAMA_HOLIDAYS = {
+  2025:['2025-01-01','2025-01-09','2025-03-03','2025-03-04','2025-04-18','2025-05-01','2025-11-03','2025-11-04','2025-11-10','2025-11-28','2025-12-08','2025-12-25'],
+  2026:['2026-01-01','2026-01-09','2026-02-16','2026-02-17','2026-04-03','2026-05-01','2026-11-03','2026-11-04','2026-11-10','2026-11-28','2026-12-08','2026-12-25'],
+  2027:['2027-01-01','2027-01-09','2027-02-08','2027-02-09','2027-03-26','2027-05-01','2027-11-03','2027-11-04','2027-11-10','2027-11-28','2027-12-08','2027-12-25']
+};
+</script>
+<script>/* ====================================================================
+   RADFLOW GUARD — MÓDULO DE RESÚMENES RADIOLÓGICOS
+   Tipos basados en estándares: RSNA structured report, SBAR handoff,
+   presentación docente, interconsulta.
+   ==================================================================== */
+
+const SUMMARY_TYPES=[
+  {id:'informe', name:'Informe Radiológico Estructurado', icon:'📋', color:'#1a6b7a',
+   desc:'Informe formal del estudio (estándar RSNA): indicación, técnica, hallazgos e impresión.',
+   sections:[
+     {key:'estudio',label:'Estudio realizado',icon:'🩻',rows:2,pf:s=>s.studiesStr,ph:'Tipo de estudio y región'},
+     {key:'tecnica',label:'Técnica / protocolo',icon:'⚙️',rows:2,pf:s=>'',ph:'Contraste, fases, secuencias, dosis, mAs/kVp...'},
+     {key:'indicacion',label:'Indicación clínica',icon:'📋',rows:2,pf:s=>[s.hist,s.desc?('Descartar: '+s.desc):''].filter(Boolean).join('. '),ph:'Motivo del estudio'},
+     {key:'comparacion',label:'Comparación (estudios previos)',icon:'🔁',rows:1,pf:s=>'',ph:'Estudios previos comparados o "sin estudios previos"'},
+     {key:'hallazgos',label:'Hallazgos',icon:'🔬',rows:6,pf:s=>'',ph:'Descripción por sistema/órgano:\n• Parénquima / órgano principal\n• Estructuras vasculares\n• Espacios / cavidades\n• Hueso y partes blandas\n• Otros'},
+     {key:'critico',label:'Hallazgo crítico / comunicación urgente',icon:'⚠️',rows:2,critical:true,pf:s=>'',ph:'Hallazgo que requiere notificación inmediata al médico tratante (si aplica)'},
+     {key:'impresion',label:'Impresión diagnóstica',icon:'🎯',rows:4,emphasis:true,pf:s=>'',ph:'Lista numerada, lo más relevante primero:\n1. Diagnóstico principal\n2. Hallazgos secundarios\n3. Diferenciales'},
+     {key:'recomendaciones',label:'Recomendaciones',icon:'➡️',rows:2,pf:s=>'',ph:'Seguimiento, estudios adicionales, correlación clínica'}
+   ]},
+  {id:'sbar', name:'Entrega de Turno (SBAR)', icon:'🔄', color:'#7c3aed',
+   desc:'Pase de pendientes al siguiente turno con el método SBAR (Situación–Antecedentes–Evaluación–Recomendación).',
+   sections:[
+     {key:'situacion',label:'S · Situación',icon:'📍',rows:2,pf:s=>[s.name||'Paciente',s.edad?s.edad+(s.sexo?' '+s.sexo:''):'',s.ub,s.studiesStr].filter(Boolean).join(' · '),ph:'Quién es, dónde está y qué estudio'},
+     {key:'antecedentes',label:'B · Antecedentes',icon:'📜',rows:3,pf:s=>[s.hist,s.app?('APP: '+s.app):'',(s.labs&&s.labs!=='—')?('Labs: '+s.labs):''].filter(Boolean).join('\n'),ph:'Historia, antecedentes y labs relevantes'},
+     {key:'evaluacion',label:'A · Evaluación',icon:'🔍',rows:3,pf:s=>s.status?('Estado: '+s.status):'',ph:'Estado actual, hallazgos preliminares, qué se hizo'},
+     {key:'recomendacion',label:'R · Recomendación / pendientes',icon:'✅',rows:3,critical:true,pf:s=>s.pendingStr,ph:'Qué debe hacer/seguir el siguiente turno'}
+   ]},
+  {id:'docente', name:'Presentación Docente', icon:'🎓', color:'#c79a3a',
+   desc:'Resumen para sesión clínica o docencia, con diferencial y puntos de aprendizaje.',
+   sections:[
+     {key:'presentacion',label:'Presentación del caso',icon:'👤',rows:2,pf:s=>[s.edad?s.edad+(s.sexo?' '+s.sexo:''):'',s.serv].filter(Boolean).join(' · '),ph:'Datos demográficos y contexto'},
+     {key:'historia',label:'Historia clínica',icon:'📋',rows:3,pf:s=>[s.hist,s.app?('APP: '+s.app):''].filter(Boolean).join('\n'),ph:'Cuadro clínico y antecedentes'},
+     {key:'estudios',label:'Estudios y técnica',icon:'🩻',rows:2,pf:s=>s.studiesStr,ph:'Estudios realizados y cómo'},
+     {key:'hallazgos',label:'Hallazgos de imagen',icon:'🔬',rows:4,pf:s=>'',ph:'Descripción detallada de los hallazgos'},
+     {key:'ddx',label:'Diagnóstico diferencial',icon:'🔀',rows:3,pf:s=>s.desc?('A considerar: '+s.desc):'',ph:'Lista de diferenciales con razones'},
+     {key:'dxfinal',label:'Diagnóstico final',icon:'🎯',rows:2,critical:true,pf:s=>'',ph:'Diagnóstico definitivo / más probable'},
+     {key:'perlas',label:'Perlas / puntos de aprendizaje',icon:'💡',rows:3,pf:s=>'',ph:'Lo que el caso enseña; signos clave'},
+     {key:'referencias',label:'Referencias',icon:'📚',rows:2,pf:s=>'',ph:'Bibliografía o fuentes (opcional)'}
+   ]},
+  {id:'interconsulta', name:'Interconsulta', icon:'📨', color:'#d97706',
+   desc:'Respuesta a una interconsulta: resumen, impresión y conclusión para el servicio solicitante.',
+   sections:[
+     {key:'motivo',label:'Motivo de interconsulta',icon:'❓',rows:2,pf:s=>s.desc,ph:'Qué se consulta'},
+     {key:'resumen',label:'Resumen clínico',icon:'📋',rows:3,pf:s=>[s.hist,(s.labs&&s.labs!=='—')?('Labs: '+s.labs):''].filter(Boolean).join('\n'),ph:'Síntesis del caso'},
+     {key:'estudios',label:'Estudios realizados',icon:'🩻',rows:2,pf:s=>s.studiesStr,ph:'Imágenes evaluadas'},
+     {key:'impresion',label:'Impresión / hallazgos',icon:'🔬',rows:4,pf:s=>'',ph:'Hallazgos e interpretación'},
+     {key:'conclusion',label:'Conclusión / respuesta',icon:'🎯',rows:3,critical:true,pf:s=>'',ph:'Respuesta directa a la interconsulta'},
+     {key:'recomendaciones',label:'Recomendaciones',icon:'➡️',rows:2,pf:s=>'',ph:'Sugerencias de manejo o seguimiento'}
+   ]}
+];
+
+let sumPatient='current', sumTypeId=null, sumData={};
+
+function sumType(){return SUMMARY_TYPES.find(t=>t.id===sumTypeId);}
+function buildSrc(){
+  if(sumPatient==='new')return{};
+  if(sumPatient==='current'){
+    if(typeof C!=='function')return{};
+    const c=C();
+    return{name:c.px,ced:c.ced,edad:c.edad,sexo:c.sexo,ub:c.ub,serv:c.serv,doc:c.doc,ext:c.ext,hist:c.hist,exam:c.exam,desc:c.desc,app:c.app,apqx:c.apqx,studiesStr:(cStudies||[]).map(s=>s.name).join(', '),labs:(typeof labsLine==='function'?labsLine():'—'),pendingStr:(typeof pendingLines==='function'?pendingLines().join('\n'):''),status:(typeof statusLabel==='function'?statusLabel():'')};
+  }
+  const h=D.history[sumPatient]||{};const p=h.px||{};
+  return{name:p.n||'',ced:p.ced||'',edad:p.edad||'',sexo:p.sexo||'',ub:p.ub||'',serv:h.serv||'',doc:h.doc||'',ext:h.ext||'',hist:h.hist||'',exam:h.exam||'',desc:h.desc||'',app:h.app||'',apqx:h.apqx||'',studiesStr:(h.studies||[]).join(', '),labs:h.labs||'—',pendingStr:(h.pending||[]).join('\n'),status:h.status||''};
+}
+
+function renderSummaryPicker(){
+  const sel=document.getElementById('sumPatient');
+  if(sel){
+    let opts='<option value="current">👉 Caso actual (lo que estás llenando)</option>';
+    (D.history||[]).forEach((h,i)=>{const who=h.px?(h.px.n||'Sin nombre'):'Sin datos personales';opts+=`<option value="${i}">${esc(h.date)} · ${esc(who)} · ${esc((h.studies||[]).join(', ').slice(0,40))}</option>`;});
+    opts+='<option value="new">➕ Nuevo en blanco</option>';
+    sel.innerHTML=opts;sel.value=sumPatient;
+  }
+  const grid=document.getElementById('sumTypeGrid');
+  if(grid)grid.innerHTML=SUMMARY_TYPES.map(t=>`<div class="sum-type-card${sumTypeId===t.id?' active':''}" style="--tc:${t.color}" onclick="pickSummaryType('${t.id}')"><div class="stc-icon" style="background:${t.color}">${t.icon}</div><div class="stc-body"><b>${esc(t.name)}</b><span>${esc(t.desc)}</span></div></div>`).join('');
+  renderSummaryHistory();
+  if(sumTypeId)renderSummaryForm();else{const f=document.getElementById('sumFormArea');if(f)f.innerHTML='';}
+}
+function pickSummaryPatient(){sumPatient=document.getElementById('sumPatient').value;sumData={};if(sumTypeId)renderSummaryForm();}
+function pickSummaryType(id){sumTypeId=id;sumData={};renderSummaryPicker();const a=document.getElementById('sumFormArea');if(a)a.scrollIntoView({behavior:'smooth',block:'start'});}
+
+function renderSummaryForm(){
+  const t=sumType();if(!t)return;const src=buildSrc();const area=document.getElementById('sumFormArea');if(!area)return;
+  const get=(k,def)=>sumData[k]!==undefined?sumData[k]:def;
+  const today=new Date().toLocaleDateString('es-PA',{year:'numeric',month:'2-digit',day:'2-digit'});
+  let h=`<div class="card sum-form-card" style="border-top:4px solid ${t.color}">
+    <div class="sum-form-head"><span class="sfh-icon" style="background:${t.color}">${t.icon}</span><div><div class="card-title" style="margin:0">${esc(t.name)}</div><span class="muted">Autocompletado desde: ${sumSrcLabel()}</span></div></div>
+    <div class="div"></div>
+    <div class="card-title" style="font-size:.95rem">Datos del informe</div>
+    <div class="g2">
+      <div><label>Paciente</label><input id="sf_pname" value="${esc(get('pname',src.name||''))}" oninput="setSumField('pname',this.value)"></div>
+      <div><label>Cédula / ID</label><input id="sf_pced" value="${esc(get('pced',src.ced||''))}" oninput="setSumField('pced',this.value)"></div>
+    </div>
+    <div class="g3">
+      <div><label>Edad</label><input id="sf_pedad" value="${esc(get('pedad',src.edad||''))}" oninput="setSumField('pedad',this.value)"></div>
+      <div><label>Sexo</label><input id="sf_psexo" value="${esc(get('psexo',src.sexo||''))}" oninput="setSumField('psexo',this.value)"></div>
+      <div><label>Ubicación</label><input id="sf_pub" value="${esc(get('pub',src.ub||''))}" oninput="setSumField('pub',this.value)"></div>
+    </div>
+    <div class="g3">
+      <div><label>Servicio</label><input id="sf_pserv" value="${esc(get('pserv',src.serv||''))}" oninput="setSumField('pserv',this.value)"></div>
+      <div><label>Médico / Residente</label><input id="sf_pdoc" value="${esc(get('pdoc',src.doc||''))}" oninput="setSumField('pdoc',this.value)"></div>
+      <div><label>Fecha</label><input id="sf_pfecha" value="${esc(get('pfecha',today))}" oninput="setSumField('pfecha',this.value)"></div>
+    </div>`;
+  h+='<div class="div"></div><div class="card-title" style="font-size:.95rem">Secciones del resumen</div>';
+  t.sections.forEach(sec=>{
+    const val=get(sec.key, sec.pf(src)||'');
+    const cls=sec.critical?'sum-sec critical':(sec.emphasis?'sum-sec emphasis':'sum-sec');
+    h+=`<div class="${cls}"><label class="sum-sec-label">${sec.icon} ${esc(sec.label)}${sec.critical?' <span class="crit-tag">CRÍTICO</span>':''}</label><textarea rows="${sec.rows}" placeholder="${esc(sec.ph)}" oninput="setSumField('${sec.key}',this.value)">${esc(val)}</textarea></div>`;
+  });
+  h+=`<div class="div"></div>
+    <div class="br3">
+      <button class="btn gn" onclick="exportSummaryWord()">📄 Word</button>
+      <button class="btn" style="background:#1f7244" onclick="exportSummaryExcel()">📊 Excel</button>
+      <button class="btn gh" onclick="copySummaryText()">📋 Copiar texto</button>
+    </div>
+    <button class="btn nv" style="margin-top:7px" onclick="saveSummary()">💾 Guardar resumen</button>
+  </div>`;
+  area.innerHTML=h;
+}
+function setSumField(k,v){sumData[k]=v;}
+function sumSrcLabel(){if(sumPatient==='current')return'Caso actual';if(sumPatient==='new')return'Nuevo en blanco';const h=D.history[sumPatient];return h?(h.date+' · '+(h.px?h.px.n||'sin nombre':'sin datos')):'—';}
+
+function collectSummary(){
+  const t=sumType();if(!t)return null;const src=buildSrc();const get=(k,def)=>sumData[k]!==undefined?sumData[k]:def;
+  const today=new Date().toLocaleDateString('es-PA',{year:'numeric',month:'2-digit',day:'2-digit'});
+  const patient={name:get('pname',src.name||''),ced:get('pced',src.ced||''),edad:get('pedad',src.edad||''),sexo:get('psexo',src.sexo||''),ub:get('pub',src.ub||''),serv:get('pserv',src.serv||''),doc:get('pdoc',src.doc||''),fecha:get('pfecha',today)};
+  const sections=t.sections.map(sec=>({label:sec.label,icon:sec.icon,critical:!!sec.critical,emphasis:!!sec.emphasis,value:get(sec.key,sec.pf(src)||'')}));
+  return{type:t,patient,sections};
+}
+
+/* ---- TEXTO PLANO (copiar/WhatsApp) ---- */
+function summaryToText(){
+  const s=collectSummary();if(!s)return'';
+  const p=s.patient;
+  let lines=[`📋 ${s.type.name.toUpperCase()}`,'━━━━━━━━━━━━━━━',
+    `Paciente: ${p.name||'—'}${p.ced?' · '+p.ced:''}`,
+    `Edad/Sexo: ${p.edad||'—'}${p.sexo?' '+p.sexo:''} · Ubicación: ${p.ub||'—'}`,
+    `Servicio: ${p.serv||'—'} · Médico: ${p.doc||'—'} · Fecha: ${p.fecha}`,'━━━━━━━━━━━━━━━'];
+  s.sections.forEach(sec=>{if(!sec.value.trim())return;lines.push(`${sec.critical?'⚠️ ':''}${sec.label.toUpperCase()}:`);lines.push(sec.value);lines.push('');});
+  return lines.join('\n').trim();
+}
+function copySummaryText(){const txt=summaryToText();if(!txt){toast('Nada que copiar');return;}if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(()=>toast('✅ Texto copiado')).catch(()=>fbCopy(txt));else fbCopy(txt);}
+
+/* ---- PALETA EXPORTS ---- */
+const SUM_PAL={navy:'#0d2e41',teal:'#1a6b7a',soft:'#eef4f7',line:'#cdd7de',gold:'#c79a3a',crit:'#c0392b',critBg:'#fbe3e0',ink:'#16242e',muted:'#5a6b76'};
+
+/* ---- WORD (.doc HTML estilizado) ---- */
+function exportSummaryWord(){
+  const s=collectSummary();if(!s){toast('Generá el resumen primero');return;}const p=s.patient,P=SUM_PAL,tc=s.type.color;
+  const secRows=s.sections.filter(x=>x.value.trim()).map(sec=>{
+    const body=esc(sec.value).replace(/\n/g,'<br>');
+    if(sec.critical)return`<tr><td class="sec-h crit-h">${esc(sec.label)}</td></tr><tr><td class="sec-b crit-b">${body}</td></tr>`;
+    if(sec.emphasis)return`<tr><td class="sec-h emp-h">${esc(sec.label)}</td></tr><tr><td class="sec-b emp-b">${body}</td></tr>`;
+    return`<tr><td class="sec-h">${esc(sec.label)}</td></tr><tr><td class="sec-b">${body}</td></tr>`;
+  }).join('');
+  const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:w="urn:schemas-microsoft-com:office:word"><head><meta charset="utf-8"><title>${esc(s.type.name)}</title>
+  <style>
+  @page{size:A4;margin:2cm}
+  body{font-family:'Calibri','Segoe UI',Arial,sans-serif;color:${P.ink};font-size:11pt;line-height:1.45}
+  .doc-title{background:${P.navy};color:#fff;padding:16px 20px;border-radius:6px}
+  .doc-title h1{margin:0;font-size:18pt;font-weight:700}
+  .doc-title .sub{color:#cfe0e8;font-size:10pt;margin-top:3px}
+  .accent{height:4px;background:${tc};margin:0 0 14px}
+  table{border-collapse:collapse;width:100%}
+  .pinfo{margin:14px 0;border:1px solid ${P.line}}
+  .pinfo td{padding:7px 11px;border:1px solid ${P.line};font-size:10.5pt;vertical-align:top}
+  .pinfo .lbl{background:${P.soft};font-weight:700;color:${P.teal};width:26%}
+  .sections{margin-top:10px}
+  .sec-h{background:${P.teal};color:#fff;font-weight:700;padding:7px 12px;font-size:11pt;border:1px solid ${P.teal}}
+  .sec-b{padding:9px 13px;border:1px solid ${P.line};border-top:none;background:#fff;font-size:10.5pt}
+  .emp-h{background:${P.navy}}
+  .emp-b{background:${P.soft};border-left:4px solid ${P.navy};font-weight:600}
+  .crit-h{background:${P.crit};border-color:${P.crit}}
+  .crit-b{background:${P.critBg};border-left:4px solid ${P.crit};color:${P.crit};font-weight:600}
+  .foot{margin-top:22px;padding-top:10px;border-top:1px solid ${P.line};color:${P.muted};font-size:8.5pt;text-align:center}
+  .badge{display:inline-block;background:${tc};color:#fff;padding:2px 10px;border-radius:10px;font-size:9pt;margin-top:6px}
+  </style></head><body>
+  <div class="doc-title"><h1>${s.type.icon} ${esc(s.type.name)}</h1><div class="sub">RadFlow Guard · Radiología · CHDr Dr. Arnulfo Arias Madrid</div></div>
+  <div class="accent"></div>
+  <table class="pinfo">
+    <tr><td class="lbl">Paciente</td><td>${esc(p.name||'—')}</td><td class="lbl">Cédula / ID</td><td>${esc(p.ced||'—')}</td></tr>
+    <tr><td class="lbl">Edad / Sexo</td><td>${esc(p.edad||'—')}${p.sexo?' · '+esc(p.sexo):''}</td><td class="lbl">Ubicación</td><td>${esc(p.ub||'—')}</td></tr>
+    <tr><td class="lbl">Servicio</td><td>${esc(p.serv||'—')}</td><td class="lbl">Médico / Residente</td><td>${esc(p.doc||'—')}</td></tr>
+    <tr><td class="lbl">Fecha</td><td colspan="3">${esc(p.fecha)}</td></tr>
+  </table>
+  <table class="sections">${secRows||'<tr><td class="sec-b">Sin contenido.</td></tr>'}</table>
+  <div class="foot">Generado por RadFlow Guard · ${esc(p.fecha)} · Documento de apoyo clínico, no sustituye el informe oficial validado.</div>
+  </body></html>`;
+  dl(html,'application/msword',`resumen_${s.type.id}_${new Date().toISOString().slice(0,10)}.doc`);
+  toast('📄 Word descargado');
+}
+
+/* ---- EXCEL (.xls HTML estilizado) ---- */
+function exportSummaryExcel(){
+  const s=collectSummary();if(!s){toast('Generá el resumen primero');return;}const p=s.patient,P=SUM_PAL,tc=s.type.color;
+  const secRows=s.sections.map(sec=>{
+    const val=esc(sec.value).replace(/\n/g,'<br>');
+    const cls=sec.critical?'crit':(sec.emphasis?'emp':'');
+    return`<tr><td class="seclabel ${cls}">${esc(sec.label)}${sec.critical?' ⚠️':''}</td><td class="secval ${cls}">${val||'—'}</td></tr>`;
+  }).join('');
+  const style=`<style>
+  table{border-collapse:collapse;font-family:Calibri,Arial,sans-serif;font-size:11pt}
+  caption{font-size:15pt;font-weight:bold;color:${P.navy};padding:10px;text-align:left}
+  .htitle td{background:${P.navy};color:#fff;font-size:14pt;font-weight:bold;padding:10px 12px}
+  .accent td{background:${tc};height:5px;padding:0}
+  .pi td{padding:6px 11px;border:1px solid ${P.line};font-size:10.5pt}
+  .pi .lbl{background:${P.soft};font-weight:bold;color:${P.teal};width:160px}
+  th{background:${P.teal};color:#fff;font-weight:bold;padding:8px 11px;border:1px solid ${P.teal};text-align:left}
+  .seclabel{background:${P.soft};font-weight:bold;color:${P.navy};padding:8px 11px;border:1px solid ${P.line};vertical-align:top;width:230px}
+  .secval{padding:8px 11px;border:1px solid ${P.line};vertical-align:top}
+  .crit{background:${P.critBg}!important;color:${P.crit}!important;font-weight:bold}
+  .emp{background:#e8eef2!important;font-weight:bold}
+  .foot td{color:${P.muted};font-size:8.5pt;padding:8px;text-align:center}
+  </style>`;
+  const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8">${style}</head><body>
+  <table>
+    <tr class="htitle"><td colspan="2">${s.type.icon} ${esc(s.type.name)}</td></tr>
+    <tr class="accent"><td colspan="2"></td></tr>
+    <tr class="pi"><td class="lbl">Paciente</td><td>${esc(p.name||'—')}</td></tr>
+    <tr class="pi"><td class="lbl">Cédula / ID</td><td>${esc(p.ced||'—')}</td></tr>
+    <tr class="pi"><td class="lbl">Edad / Sexo</td><td>${esc(p.edad||'—')}${p.sexo?' · '+esc(p.sexo):''}</td></tr>
+    <tr class="pi"><td class="lbl">Ubicación</td><td>${esc(p.ub||'—')}</td></tr>
+    <tr class="pi"><td class="lbl">Servicio</td><td>${esc(p.serv||'—')}</td></tr>
+    <tr class="pi"><td class="lbl">Médico / Residente</td><td>${esc(p.doc||'—')}</td></tr>
+    <tr class="pi"><td class="lbl">Fecha</td><td>${esc(p.fecha)}</td></tr>
+    <tr><th>Sección</th><th>Contenido</th></tr>
+    ${secRows}
+    <tr class="foot"><td colspan="2">Generado por RadFlow Guard · ${esc(p.fecha)} · Documento de apoyo, no sustituye el informe oficial validado.</td></tr>
+  </table></body></html>`;
+  dl('\ufeff'+html,'application/vnd.ms-excel',`resumen_${s.type.id}_${new Date().toISOString().slice(0,10)}.xls`);
+  toast('📊 Excel descargado');
+}
+function dl(content,mime,name){try{const blob=new Blob([content],{type:mime});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);}catch(e){toast('No se pudo descargar');}}
+
+/* ---- GUARDAR / HISTORIAL DE RESÚMENES ---- */
+function saveSummary(){
+  const s=collectSummary();if(!s){toast('Nada que guardar');return;}
+  D.summaries.unshift({ts:Date.now(),date:new Date().toLocaleDateString('es-PA'),typeId:s.type.id,typeName:s.type.name,icon:s.type.icon,patient:s.patient,data:JSON.parse(JSON.stringify(sumData)),src:sumPatient});
+  if(D.summaries.length>200)D.summaries=D.summaries.slice(0,200);
+  save();renderSummaryHistory();toast('💾 Resumen guardado');
+}
+function renderSummaryHistory(){
+  const box=document.getElementById('sumHistList');if(!box)return;
+  if(!D.summaries||!D.summaries.length){box.innerHTML='<p class="muted">Sin resúmenes guardados.</p>';return;}
+  box.innerHTML=D.summaries.map((s,i)=>`<div class="item"><div><b>${s.icon} ${esc(s.typeName)}</b><span>${esc(s.date)} · ${esc(s.patient.name||'sin nombre')}${s.patient.ub?' · '+esc(s.patient.ub):''}</span></div><div class="acts"><button class="ib" onclick="loadSummary(${i})">Abrir</button><button class="ib d" onclick="delSummary(${i})">X</button></div></div>`).join('');
+}
+function loadSummary(i){const s=D.summaries[i];if(!s)return;sumTypeId=s.typeId;sumPatient=s.src;sumData=JSON.parse(JSON.stringify(s.data||{}));['pname','pced','pedad','psexo','pub','pserv','pdoc','pfecha'].forEach(k=>{if(s.patient[k.slice(1)]!==undefined&&sumData[k]===undefined)sumData[k]=s.patient[k.slice(1)];});renderSummaryPicker();renderSummaryForm();const a=document.getElementById('sumFormArea');if(a)a.scrollIntoView({behavior:'smooth'});toast('Resumen cargado');}
+function delSummary(i){D.summaries.splice(i,1);save();renderSummaryHistory();toast('Eliminado');}
+</script>
+<script>/* ====================================================================
+   RADFLOW GUARD v4 — MOTOR
+   ==================================================================== */
+const KEY='rg_v4';
+const DIV='━━━━━━━━━━━━━━━';
+function baseData(){return{
+  theme:'clinico',
+  services:[{n:'Urgencias',t:'Urgencias'},{n:'Medicina Interna',t:'Hospitalización'},{n:'Cirugía',t:'Quirúrgico'},{n:'Pediatría',t:'Hospitalización'},{n:'UCI',t:'UCI'},{n:'Urología',t:'Hospitalización'},{n:'Ortopedia / Trauma',t:'Quirúrgico'},{n:'Neurología / Neurocirugía',t:'Hospitalización'},{n:'Ginecología / Obstetricia',t:'Hospitalización'},{n:'Gastroenterología',t:'Hospitalización'},{n:'Oncología',t:'Hospitalización'},{n:'Cardiología',t:'Hospitalización'},{n:'Nefrología',t:'Hospitalización'},{n:'Consulta externa',t:'Ambulatorio'}],
+  studies:clone(SEED_STUDIES),modalities:clone(SEED_MODALITIES),history:[],shiftDays:{},summaries:[]}}
+function clone(o){return JSON.parse(JSON.stringify(o))}
+function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s)return Object.assign(clone(baseData()),s);}catch(e){}return clone(baseData());}
+let D=load(),cStudies=[],labState={},voiceParsed={},stLabReqs=[];
+/* Migración: días viejos con turno:true → kind:'turno' */
+Object.keys(D.shiftDays||{}).forEach(k=>{const o=D.shiftDays[k];if(o&&o.turno===true&&!o.kind){o.kind='turno';delete o.turno;}});
+function save(){try{localStorage.setItem(KEY,JSON.stringify(D));}catch(e){toast('No se pudo guardar');}render();}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function v(id){const e=document.getElementById(id);return e?(e.value||'').trim():'';}
+function sv(id,val){const e=document.getElementById(id);if(e)e.value=val||'';}
+function show(id,on){const e=document.getElementById(id);if(e)e.classList.toggle('hidden',!on);}
+function toast(m='Copiado'){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove('show'),1900);}
+function fmtDate(d){return d.toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'});}
+function dateKey(y,m,d){return`${y}-${String(m+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;}
+function labById(id){return LABS.find(l=>l.id===id);}
+
+/* COPIADO */
+async function copyOut(id){const el=document.getElementById(id);if(!el||!el.value.trim()){toast('Nada que copiar');return;}const txt=el.value;if(navigator.clipboard&&window.isSecureContext){try{await navigator.clipboard.writeText(txt);toast('✅ Copiado');return;}catch(e){}}try{el.removeAttribute('readonly');el.focus();el.select();el.setSelectionRange(0,txt.length);const ok=document.execCommand('copy');el.setAttribute('readonly','');if(ok){toast('✅ Copiado');return;}}catch(e){}selOut(id);toast('Seleccionado — mantené presionado y "Copiar"');}
+function selOut(id){const el=document.getElementById(id);if(!el)return;el.removeAttribute('readonly');el.focus();el.select();el.setSelectionRange(0,(el.value||'').length);el.setAttribute('readonly','');}
+function openWA(id){const el=document.getElementById(id);if(!el||!el.value.trim()){toast('Generá el mensaje primero');return;}window.open('https://wa.me/?text='+encodeURIComponent(el.value),'_blank');}
+
+/* NAVEGACIÓN */
+const VIEWS=['vCaso','vVoz','vResumenes','vTurnos','vConfig','vManual'];
+function goV(vid,idx){VIEWS.forEach(id=>document.getElementById(id).classList.remove('active'));document.getElementById(vid).classList.add('active');document.querySelectorAll('.bnav button').forEach((b,i)=>b.classList.toggle('active',i===idx));window.scrollTo({top:0,behavior:'smooth'});if(vid==='vTurnos')renderCal();if(vid==='vResumenes'&&typeof renderSummaryPicker==='function')renderSummaryPicker();}
+function goMod(m){document.querySelectorAll('.mod').forEach(x=>x.classList.remove('active'));document.getElementById(m).classList.add('active');document.querySelectorAll('.cnav button').forEach(b=>b.classList.toggle('active',b.dataset.mod===m));}
+document.querySelectorAll('.cnav button').forEach(b=>b.onclick=()=>goMod(b.dataset.mod));
+document.querySelectorAll('.ttab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ttab').forEach(x=>x.classList.remove('active'));b.classList.add('active');buildCase();});
+document.querySelectorAll('.vm').forEach(b=>b.onclick=()=>{document.querySelectorAll('.vm').forEach(x=>x.classList.remove('active'));b.classList.add('active');show('vmRecBar',b.dataset.m==='dict');});
+
+/* TEMAS */
+function renderThemes(){document.getElementById('themeGrid').innerHTML=THEMES.map(t=>`<div class="theme-card${D.theme===t.id?' active':''}" onclick="selectTheme('${t.id}')"><div class="theme-swatches">${t.swatch.map(c=>`<span class="theme-sw" style="background:${c}"></span>`).join('')}</div><b>${esc(t.name)}</b><span>${esc(t.desc)}</span></div>`).join('');}
+function selectTheme(id){D.theme=id;applyTheme(id);renderThemes();save();toast('Tema aplicado');}
+
+/* LABS GRID */
+function initLabs(){
+  const grid=document.getElementById('labsGrid');
+  let h=`<button class="lab-btn" data-lid="__panel" onclick="togglePanel()" title="Despliega los labs de un panel de triage">🩸 Panel triage</button>`;
+  h+=LABS.map(l=>`<button class="lab-btn" data-lid="${l.id}" onclick="toggleLab('${l.id}')" title="${esc(l.full)}${l.unit?' ('+l.unit+')':''}">${esc(l.ab)}</button>`).join('');
+  grid.innerHTML=h;
+}
+function togglePanel(){const allOn=PANEL_COMPONENTS.every(id=>labState[id]&&labState[id]!='');PANEL_COMPONENTS.forEach(id=>{if(allOn)labState[id]='';else if(!labState[id])labState[id]='on';updateLabBtn(id);});renderLabActive();refreshLabSuggestions();buildCase();toast(allOn?'Panel quitado':'Panel de triage desplegado');}
+function suggestedLabIds(){const set=new Set();const sexo=v('cSexo');cStudies.forEach(s=>studyLabReqs(s).forEach(r=>{if(r.cond==='mujer'&&sexo!=='Femenino')return;set.add(r.lab);}));return set;}
+function refreshLabSuggestions(){const sug=suggestedLabIds();document.querySelectorAll('#labsGrid .lab-btn').forEach(b=>{const id=b.dataset.lid;if(id==='__panel')return;b.classList.toggle('suggested',sug.has(id)&&!(labState[id]&&labState[id]!=''));});}
+function toggleLab(id){const cur=labState[id]||'';if(cur==='')labState[id]='on';else if(cur==='on')labState[id]='';else labState[id]='on';updateLabBtn(id);renderLabActive();refreshLabSuggestions();buildCase();}
+function updateLabBtn(id){const btn=document.querySelector(`#labsGrid [data-lid="${id}"]`);if(!btn)return;const s=labState[id]||'';btn.className='lab-btn'+(s&&s!=='on'?' has-val':s==='on'?' on':'');btn.innerHTML=esc(labById(id)?.ab||id)+(s&&s!=='on'?`<span class="lab-val">${esc(s)}</span>`:'');}
+function renderLabActive(){
+  const active=LABS.filter(l=>labState[l.id]&&labState[l.id]!='');const box=document.getElementById('labsActive');
+  if(!active.length){box.innerHTML='';return;}
+  const groups={};active.forEach(l=>(groups[l.grp]=groups[l.grp]||[]).push(l));
+  let h='';
+  Object.keys(groups).forEach(g=>{h+=`<div class="lab-group-label">${esc(g)}</div>`;groups[g].forEach(l=>{h+=`<div class="lab-input-row"><div class="lr-label"><span class="lr-ab">${esc(l.ab)}</span><span class="lr-full">${esc(l.full)}</span></div><input placeholder="valor" value="${esc(labState[l.id]==='on'?'':labState[l.id])}" oninput="setLabVal('${l.id}',this.value)"><span class="lr-unit">${esc(l.unit||'')}</span><button class="lr-rm" onclick="toggleLab('${l.id}')">✕</button></div>`;});});
+  box.innerHTML=h;
+}
+function setLabVal(id,val){labState[id]=val.trim()||'on';updateLabBtn(id);refreshLabSuggestions();buildCase();}
+function labsLine(){const parts=LABS.filter(l=>labState[l.id]&&labState[l.id]!='').map(l=>{const s=labState[l.id];return s==='on'?l.ab:`${l.ab} ${s}${l.unit?' '+l.unit:''}`;});return parts.length?parts.join(', ')+'.':'—';}
+
+/* BUSCADOR ESTUDIOS */
+const searchInput=document.getElementById('cStudySearch');
+const drop=document.getElementById('studyDrop');
+function renderDrop(f){const fl=(f||'').toLowerCase().trim();const matches=D.studies.filter(s=>!fl||(s.name+' '+s.modality+' '+s.region+' '+(s.ind||'')).toLowerCase().includes(fl));if(!matches.length){drop.innerHTML='<div class="sde">Sin coincidencias. Podés agregarlo en Config → Estudios.</div>';return;}const grps={};matches.forEach(s=>(grps[s.modality]=grps[s.modality]||[]).push(s));let h='';Object.keys(grps).forEach(g=>{h+=`<div class="sdg">${esc(g)}</div>`;grps[g].forEach(s=>{const ya=cStudies.some(c=>c.name===s.name);h+=`<div class="sdi" data-n="${esc(s.name)}" style="${ya?'opacity:.45':''}"><b>${esc(s.name)}${ya?' ✓':''}</b><span>${esc(s.region)} · contraste: ${esc(s.contrast)}</span></div>`;});});drop.innerHTML=h;drop.querySelectorAll('.sdi').forEach(it=>it.onclick=()=>addCStudy(it.dataset.n));}
+function openDrop(){drop.classList.add('open');renderDrop(searchInput.value);}
+function closeDrop(){setTimeout(()=>drop.classList.remove('open'),160);}
+searchInput.addEventListener('focus',openDrop);
+searchInput.addEventListener('input',()=>{drop.classList.add('open');renderDrop(searchInput.value);});
+searchInput.addEventListener('blur',closeDrop);
+function addCStudy(name){const s=D.studies.find(x=>x.name===name);if(!s)return;if(cStudies.some(c=>c.name===name)){toast('Ya está en el caso');return;}cStudies.push(clone(s));searchInput.value='';renderChips();updateSec();validate();buildCase();refreshLabSuggestions();toast('Estudio agregado ✓');}
+function rmCStudy(name){cStudies=cStudies.filter(c=>c.name!==name);renderChips();updateSec();validate();buildCase();refreshLabSuggestions();}
+function renderChips(){document.getElementById('studyChips').innerHTML=cStudies.map(s=>`<div class="schip"><div><b>${esc(s.name)}</b><span>${esc(s.modality)} · ${esc(s.region)} · contraste: ${esc(s.contrast)}</span></div><button class="ib d" onclick="rmCStudy('${esc(s.name).replace(/'/g,"\\'")}')">Quitar</button></div>`).join('');}
+
+/* SECCIONES + REQUISITOS */
+function allReqs(){const set=new Set();cStudies.forEach(s=>(s.reqs||[]).forEach(r=>set.add(r)));return[...set];}
+function anyContrast(){return cStudies.some(s=>/Sí/.test(s.contrast));}
+function anyYodado(){return cStudies.some(s=>/yodado|bario/i.test(s.contrast));}
+function anyRM(){return cStudies.some(s=>s.modality.includes('RM'));}
+function anyTC(){return cStudies.some(s=>s.modality.includes('TC'));}
+function anyInterv(){return cStudies.some(s=>s.modality.includes('Intervencionismo'));}
+function updateSec(){const r=allReqs(),h=k=>r.includes(k),none=cStudies.length===0;show('secIV',!none&&h('canalizacion'));show('secMR',!none&&anyRM());show('secPreg',!none&&(anyTC()||anyContrast()||h('embarazo')));show('secPrep',!none&&(h('ayuno')||h('vejiga_llena')||h('vejiga_vacia')||h('enema')));show('secCoag',!none&&h('coagulacion'));renderDynReqs();}
+function renderDynReqs(){
+  const box=document.getElementById('dynReqs');
+  if(!cStudies.length){box.innerHTML='<p class="muted">Agregá un estudio para ver sus requisitos condicionales.</p>';return;}
+  const sexo=v('cSexo');let html='';
+  cStudies.forEach(s=>{
+    const reqs=studyLabReqs(s).filter(r=>!(r.cond==='mujer'&&sexo!=='Femenino'));
+    html+=`<div class="req-box"><div class="req-study">${esc(s.name)}</div>`;
+    if(!reqs.length)html+='<p class="muted">Sin labs condicionales específicos (solo requisitos universales).</p>';
+    else reqs.forEach(r=>{const lab=labById(r.lab);html+=`<div class="req-item"><span class="rdot dot ${r.level}"></span><div><b><span class="req-lab-chip">${esc(lab?lab.ab:r.lab)}</span>${esc(lab?lab.full:r.lab)}${lab&&lab.unit?' ('+esc(lab.unit)+')':''}</b><small>${esc(r.note)}${r.cond==='mujer'?' (mujer en edad fértil)':''}</small></div></div>`;});
+    html+='</div>';
+  });
+  box.innerHTML=html;
+}
+
+/* VALIDACIÓN */
+function C(){return{serv:v('cServicio'),doc:v('cMedico'),ext:v('cExt'),px:v('cPaciente'),ced:v('cCedula'),edad:v('cEdad'),sexo:v('cSexo'),ub:v('cUbicacion'),app:v('cApp'),apqx:v('cApqx'),alergia:v('cAlergia'),traslado:v('cTraslado'),hist:v('cHistoria'),exam:v('cExamen'),desc:v('cDescartar'),canaliz:v('cCanaliz'),mr:v('cRmSafety'),emb:v('cEmbarazo'),prep:v('cPrep'),consent:v('cConsent'),coag:v('cCoag'),otros:v('cOtros'),valid:v('cValidacion'),imgPrev:v('cImagenPrevia')};}
+function hasCre(){return labState['cre']&&labState['cre']!='';}
+function contrastAllergy(){const a=(v('cAlergia')||'').toLowerCase();if(/contraste|yodo|medio de contraste/.test(a))return /leve/.test(a)?'leve':'severa';return null;}
+function validate(){
+  const c=C(),A=[];const add=(l,t,d)=>A.push({l,t,d});
+  if(!cStudies.length)add('red','Agregar al menos un estudio','Sin estudio no hay motor de requisitos.');
+  if(!c.serv)add('red','Falta servicio solicitante','Quién origina la solicitud.');
+  if(!c.doc)add('red','Falta médico que presenta','Para aclarar pendientes.');
+  if(!c.ext)add('red','Falta EXT/contacto','Sin contacto no se pueden pedir datos.');
+  if(!c.px)add('red','Falta nombre del paciente','ID incompleta.');
+  if(!c.edad)add('red','Falta edad','Crítica para protocolos y dosis.');
+  if(!c.ub)add('red','Falta ubicación','Necesaria para traslado.');
+  if(!c.hist)add('red','Falta historia/motivo','No basta el nombre del estudio.');
+  if(!c.desc)add('red','Falta patología a descartar','Define protocolo y requisitos.');
+  if(cStudies.length){
+    const r=allReqs(),h=k=>r.includes(k);
+    const txt=(c.desc+' '+c.hist+' '+cStudies.map(s=>s.name+' '+(s.ind||'')).join(' ')).toLowerCase();
+    const ca=contrastAllergy();
+    if(anyYodado()&&!c.alergia)add('yellow','Documentar estado de alergia','Estudio con contraste: anotar alergias o "sin alergia".');
+    if(ca==='severa')add('black','Alergia severa a contraste','Premedicación + validación superior.');
+    else if(ca==='leve')add('orange','Alergia leve a contraste','Valorar premedicación.');
+    if((h('creatinina')||h('gadolinio_renal'))&&anyContrast()&&!hasCre())add('red','Falta creatinina/eGFR','Activá el lab Cre y poné el valor (seguridad renal).');
+    if(h('canalizacion')&&anyContrast()&&!c.canaliz)add('red','Falta canalización','Necesaria para contraste IV.');
+    if(h('via_antecubital')&&!/antecubital|18|20|verde|rosada/i.test(c.canaliz))add('orange','Vía antecubital recomendada','Para AngioTC: 18-20G antecubital.');
+    if(h('dimero_d')&&/tep|embol/i.test(txt)&&!(labState['dim']&&labState['dim']!=''))add('yellow','Dímero D pendiente','Apoya sospecha de TEP.');
+    if(h('signos_vitales')&&!/sat|fc|pa|ta|fr|glasgow|estable|inestable/i.test((c.exam+c.hist).toLowerCase()))add('red','Faltan signos vitales','Especialmente en urgencias y traslado.');
+    if(anyRM()&&c.mr!=='Completo sin contraindicaciones'){if(!c.mr)add('red','Tamizaje RM incompleto','Verificar implantes, metal, claustrofobia.');else add('black','Seguridad RM no resuelta','Validar implante antes de entrar.');}
+    if((h('ayuno')||h('vejiga_llena'))&&c.prep!=='Cumplida')add('orange','Verificar preparación','Ayuno / vejiga llena según estudio.');
+    if(anyInterv()&&!['Firmado','No aplica'].includes(c.consent))add('red','Consentimiento informado pendiente','Obligatorio en intervencionismo.');
+    if(h('coagulacion')&&!c.coag)add('red','Falta coagulación/plaquetas','Antes de procedimiento invasivo.');
+    if((anyTC()||anyContrast())&&c.sexo==='Femenino'){if(c.emb==='Posible embarazo')add('black','Posible embarazo + radiación/contraste','Validación superior requerida.');else if(c.emb==='Embarazo confirmado')add('black','Embarazo confirmado','Valorar alternativas sin radiación.');else if(!c.emb)add('yellow','Estado de embarazo no documentado','Confirmar FUR/β-hCG si aplica.');}
+    if(c.traslado==='Ventilado / crítico'||/inestable/i.test(c.exam.toLowerCase()))add('black','Paciente crítico/inestable','Validación, monitor y acompañamiento.');}
+  renderStatus(A);return A;
+}
+function lvl(A){let l='green';if(A.some(a=>a.l==='yellow'))l='yellow';if(A.some(a=>a.l==='orange'))l='orange';if(A.some(a=>a.l==='red'))l='red';if(A.some(a=>a.l==='black'))l='black';return l;}
+function renderStatus(A){const p=document.getElementById('statusPanel'),h=document.getElementById('statusHead'),s=document.getElementById('statusSub'),li=document.getElementById('alertsList');const lv=lvl(A);const m={green:['sg','🟢 LISTO — Sin pendientes críticos','Todo lo requerido está completo.'],yellow:['sy','🟡 ALERTA — Falta dato no crítico','Puede avanzar con pendiente visible.'],orange:['so','🟠 ALERTA — Requiere preparación','El paciente no está listo aún.'],red:['sr','🔴 ALERTA — Falta Información Crítica','No marcar listo hasta resolver.'],black:['sb','⚫ ALERTA — Requiere validación superior','Escalar, no rechazar.']};p.className='sp '+m[lv][0];h.textContent=m[lv][1];s.textContent=m[lv][2];const ord={black:0,red:1,orange:2,yellow:3};A.sort((a,b)=>(ord[a.l]||4)-(ord[b.l]||4));li.innerHTML=A.map(a=>`<div class="ai"><span class="dot ${a.l}"></span><div><b>${esc(a.t)}</b><small>${esc(a.d)}</small></div></div>`).join('');}
+function statusLabel(){const l=lvl(validate());return{green:'🟢 LISTO',yellow:'🟡 Falta no crítica',orange:'🟠 Requiere preparación',red:'🔴 Falta crítica',black:'⚫ Validación superior'}[l];}
+function pendingLines(){return validate().filter(a=>a.l!=='green').map(a=>({red:'🔴',orange:'🟠',yellow:'🟡',black:'⚫'}[a.l]||'•')+' '+a.t);}
+
+/* GENERADOR — Formato Karol */
+function fmtMsg(c,studies,labs,pend,st){
+  const estudios=studies.length?studies.map(s=>`  • ${s}`).join('\n'):'  (sin estudios)';
+  return `SOLICITUD RADIOLÓGICA\n${DIV}\n📞 EXT: ${c.ext||'—'}\n👨‍⚕️ Médico: ${c.doc||'—'}\n🏥 Servicio: ${c.serv||'—'}\n${DIV}\n👤 Paciente: ${c.px||'—'}\n🆔 Cédula: ${c.ced||'—'}\n🎂 Edad: ${c.edad||'—'}${c.sexo?' · '+c.sexo:''}\n📜 APP: ${c.app||'—'}\n🔪 APQX: ${c.apqx||'—'}${c.alergia?'\n⚠️ Alergia: '+c.alergia:'\nAlergia: —'}\n📍 Ubicación: ${c.ub||'—'}\n🚶 Traslado: ${c.traslado||'—'}\n${DIV}\n📋 Historia: ${c.hist||'—'}\n🔬 Examen: ${c.exam||'—'}\n🧪 Labs: ${labs}\n${DIV}\n🎯 Estudio${studies.length>1?'s':''}:\n${estudios}\n❓ Descartar: ${c.desc||'—'}${c.canaliz?'\n💉 Canalización: '+c.canaliz:''}${c.consent&&c.consent!=='No aplica'?'\n🖊️ Consentimiento: '+c.consent:''}${c.imgPrev?'\n🖼️ Imagen previa: '+c.imgPrev:''}${c.otros?'\n👥 Otros servicios: '+c.otros:''}${c.valid&&c.valid!=='No requiere'?'\n🔼 Validación: '+c.valid:''}\n${DIV}\nESTADO: ${st}\n${pend.length?'PENDIENTES:\n'+pend.join('\n'):'✅ Sin pendientes'}`;
+}
+function buildCase(){
+  const c=C(),tpl=document.querySelector('.ttab.active')?.dataset.tpl||'service';
+  const studies=cStudies.map(s=>s.name),pend=pendingLines(),st=statusLabel(),labs=labsLine();
+  let out='';
+  if(tpl==='service')out=fmtMsg(c,studies,labs,pend,st);
+  else if(tpl==='rich')out=`🩻 *RADIOLOGÍA — RESUMEN*\n• ${c.serv||'—'} | ${c.doc||'—'} EXT ${c.ext||'—'}\n• ${c.px||'—'} | ${c.edad||'—'}${c.sexo?' '+c.sexo:''} | ${c.ub||'—'}\n• Historia: ${c.hist||'—'}\n• Sospecha: ${c.desc||'—'}\n• ${studies.length>1?'Estudios':'Estudio'}: ${studies.join(', ')||'—'}\n• Labs: ${labs}\n${anyContrast()||anyRM()?'• Seguridad: '+[c.canaliz?'Vía: '+c.canaliz:'',hasCre()?'Cr '+labState['cre']:'',c.mr||'',c.alergia?'Alergia: '+c.alergia:''].filter(Boolean).join(' · ')+'\n':''}${c.consent&&c.consent!=='No aplica'?'• 🖊️ Consentimiento: '+c.consent+'\n':''}• Estado: ${st}\n${pend.length?pend.join('\n'):'✅ Sin pendientes'}`;
+  else out=`🩻 PENDIENTES RADIOLOGÍA\n${c.px||'—'} · ${c.ub||'—'}\n${studies.join(', ')||'—'}\nSolicita: ${c.doc||'—'} EXT ${c.ext||'—'}\n${c.consent&&c.consent!=='No aplica'?'🖊️ Consentimiento: '+c.consent+'\n':''}${DIV}\n${pend.length?pend.join('\n')+'\n\nFavor completar para procesar.':'✅ Sin pendientes — listo.'}\nEstado: ${st}`;
+  sv('caseOut',out);return out;
+}
+
+/* HISTORIAL */
+function savePx(withData){if(!cStudies.length){toast('Agregá al menos un estudio');return;}const c=C(),now=new Date();D.history.unshift({date:fmtDate(now),ts:now.getTime(),studies:cStudies.map(s=>s.name),status:statusLabel(),serv:c.serv,doc:c.doc,ext:c.ext,desc:c.desc,hist:c.hist,exam:c.exam,app:c.app,apqx:c.apqx,labs:labsLine(),pending:pendingLines(),px:withData?{n:c.px,ced:c.ced,edad:c.edad,sexo:c.sexo,ub:c.ub}:null});if(D.history.length>300)D.history=D.history.slice(0,300);save();toast(withData?'Guardado completo':'Guardado sin datos personales');}
+function renderHistory(){const box=document.getElementById('histList');if(!D.history||!D.history.length){box.innerHTML='<p class="muted">Sin pacientes guardados.</p>';return;}box.innerHTML=D.history.map((h,i)=>{const who=h.px?`${esc(h.px.n||'—')} · ${esc(h.px.edad||'')} · ${esc(h.px.ub||'')}`:'<i>Sin datos personales</i>';return`<div class="item"><div><b>${esc(h.date)} ${h.status}</b><span>${who}<br>${esc(h.serv||'')} · ${esc((h.studies||[]).join(', '))}<br>Descartar: ${esc(h.desc||'')}${h.pending&&h.pending.length?' · '+h.pending.length+' pendientes':''}</span></div><div class="acts"><button class="ib d" onclick="delHistory(${i})">X</button></div></div>`;}).join('');}
+function delHistory(i){D.history.splice(i,1);save();toast('Eliminado');}
+function clearHistory(){if(confirm('¿Borrar todo el historial?')){D.history=[];save();}}
+function clearCase(){cStudies=[];labState={};['cMedico','cExt','cPaciente','cCedula','cEdad','cUbicacion','cApp','cApqx','cAlergia','cHistoria','cExamen','cDescartar','cCanaliz','cCoag','cOtros'].forEach(id=>sv(id,''));['cSexo','cServicio','cTraslado','cRmSafety','cEmbarazo','cPrep','cConsent','cValidacion','cImagenPrevia'].forEach(id=>sv(id,''));sv('caseOut','');renderChips();initLabs();renderLabActive();updateSec();validate();buildCase();toast('Caso limpiado');}
+
+/* VOZ */
+function norm(t){return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}
+function findStudyFromText(text){const n=norm(text);for(const s of D.studies){const terms=[...(s.syn||[]),...s.name.toLowerCase().split(/[\s\/]+/)];if(terms.some(t=>t&&t.length>2&&n.includes(norm(t))))return s;}return null;}
+let recog=null,recTimer=null,recSecs=0,recBaseText='';
+function toggleDictation(){const SR=window.SpeechRecognition||window.webkitSpeechRecognition;if(!SR){toast('Tu navegador no soporta dictado. Escribí o pegá el texto.');return;}if(recog){stopDictation();return;}recog=new SR();recog.lang='es-PA';recog.continuous=true;recog.interimResults=true;recBaseText=v('voiceTxt');recSecs=0;document.getElementById('recIndicator').classList.add('live');document.getElementById('btnRec').textContent='⏸️ Pausar dictado';sv('recStatus','🔴 Escuchando... hablá claro y pausado.');recTimer=setInterval(()=>{recSecs++;const m=String(Math.floor(recSecs/60)).padStart(2,'0'),s=String(recSecs%60).padStart(2,'0');document.getElementById('recTime').textContent=`${m}:${s}`;},1000);recog.onresult=e=>{let fin='',interim='';for(let i=e.resultIndex;i<e.results.length;i++){const tr=e.results[i][0].transcript;if(e.results[i].isFinal)fin+=tr+' ';else interim+=tr;}if(fin)recBaseText=(recBaseText+' '+fin).trim();sv('voiceTxt',(recBaseText+' '+interim).trim());};recog.onerror=ev=>{sv('recStatus','Error de dictado: '+ev.error+'. Podés escribir el texto.');stopDictation();};recog.onend=()=>{if(recog){try{recog.start();}catch(e){}}};try{recog.start();}catch(e){toast('No se pudo iniciar el dictado.');stopDictation();}}
+function stopDictation(){if(recTimer){clearInterval(recTimer);recTimer=null;}if(recog){const r=recog;recog=null;try{r.onend=null;r.stop();}catch(e){}}const ind=document.getElementById('recIndicator');if(ind)ind.classList.remove('live');const b=document.getElementById('btnRec');if(b)b.textContent='🎙️ Iniciar dictado';sv('recStatus','Dictado detenido. Revisá el texto y tocá "Analizar".');}
+function analyzeVoice(){
+  const text=v('voiceTxt');if(!text){toast('Falta transcripción');return;}
+  const r={},add=(k,label,value,conf='media',rev=false)=>r[k]={label,value:value||'',conf,rev};
+  const n=norm(text);
+  const serv=D.services.find(s=>n.includes(norm(s.n)))||(n.includes('urgencia')?{n:'Urgencias'}:null);if(serv)add('serv','Servicio',serv.n,'alta');
+  const st=findStudyFromText(text);if(st)add('estudio','Estudio',st.name,'alta');
+  const age=(text.match(/(\d{1,3})\s*(años|año)/i)||[])[1];if(age)add('edad','Edad',age,'alta');
+  const ced=(text.match(/(?:c[eé]dula|ced|id)\s*(?:es|:)?\s*([0-9][A-Za-z0-9\-\s]*)/i)||[])[1];if(ced)add('cedula','Cédula',ced.trim().slice(0,30),'media',true);
+  const cr=(text.match(/creatinina\s*(?:de|:)?\s*([0-9]+(?:[.,][0-9]+)?)/i)||[])[1];if(cr)add('creat','Creatinina',cr.replace(',','.'),'alta');
+  const dd=(text.match(/d[ií]mero\s*D?\s*(?:de|:|positivo|elevado)?\s*([0-9][A-Za-z0-9.,\s]*)/i)||[])[1];if(dd||/dimero positivo|dimero elevado/i.test(n))add('dimero','Dímero D',dd?dd.trim().slice(0,25):'positivo','media',true);
+  const via=(text.match(/(?:v[ií]a|canalizaci[oó]n)\s*([A-Za-z0-9\s]*(?:18|20|antecubital|verde|rosada)[A-Za-z0-9\s]*)/i)||[])[1];if(via)add('canaliz','Canalización',via.trim().slice(0,35),'media',true);
+  if(/sin alergia|niega alergia|no alerg/i.test(text))add('algC','Alergia','Sin alergia','alta');else if(/alergia/i.test(text))add('algC','Alergia','Sí (revisar)','media',true);
+  const ub=(text.match(/(?:sala|cama|hab|piso|cuarto)\s*([A-Za-z0-9\-\s]{1,20})/i)||[])[0];if(ub)add('ub','Ubicación',ub.trim().slice(0,30),'media',true);
+  const mot=(text.match(/(?:por|motivo|consulta por|presenta por)\s+([^.]{4,80})/i)||[])[1];if(mot)add('hist','Historia',mot.trim(),'media',true);
+  const desc=(text.match(/(?:descartar|sospecha de|para descartar)\s+([A-Za-záéíóúñ\s]{3,60})/i)||[])[1];if(desc)add('desc','Descartar',desc.trim(),'media',true);
+  const nom=(text.match(/(?:paciente|presenta(?:n)? a)\s+([A-ZÁÉÍÓÚ][a-záéíóúñ]+(?:\s+[A-ZÁÉÍÓÚ][a-záéíóúñ]+)+)/)||[])[1];if(nom)add('px','Paciente',nom,'media',true);
+  voiceParsed=r;renderVoiceResult(r);toast('Análisis completado');
+}
+function buildVoiceMessage(r){
+  const c={ext:'',doc:'',serv:r.serv?.value||'',px:r.px?.value||'',ced:r.cedula?.value||'',edad:r.edad?.value||'',sexo:'',app:'',apqx:'',alergia:r.algC?.value||'',traslado:'',hist:r.hist?.value||'',exam:'',desc:r.desc?.value||'',canaliz:r.canaliz?.value||'',consent:'',imgPrev:'',otros:'',valid:''};
+  const studies=r.estudio?.value?[r.estudio.value]:[];
+  const labParts=[];if(r.creat?.value)labParts.push('Cre '+r.creat.value+' mg/dL');if(r.dimero?.value)labParts.push('Dímero D '+r.dimero.value);
+  const labs=labParts.length?labParts.join(', ')+'.':'—';
+  const miss=['serv','estudio','edad','ub','hist','desc'].filter(k=>!r[k]).map(k=>'🔴 '+({serv:'servicio',estudio:'estudio',edad:'edad',ub:'ubicación',hist:'motivo',desc:'descartar'}[k]));
+  return fmtMsg(c,studies,labs,miss,miss.length?'🔴 Revisar y completar':'🟡 Revisar datos detectados');
+}
+function renderVoiceResult(r){const card=document.getElementById('voiceResultCard');card.style.display='block';const tbl=document.getElementById('voiceTable');const det=Object.values(r);tbl.innerHTML=det.map(f=>`<tr><td>${esc(f.label)}</td><td>${esc(f.value)}</td><td class="conf-${f.conf==='alta'?'a':f.conf==='media'?'m':'b'}">${f.conf}</td><td>${f.rev?'<span class="rev-flag">Revisar</span>':''}</td></tr>`).join('')||'<tr><td colspan="4">Sin datos detectados. Probá redactar el texto más completo.</td></tr>';const keys=['serv','estudio','edad','ub','hist','desc'],miss=keys.filter(k=>!r[k]);const labels={serv:'servicio',estudio:'estudio',edad:'edad',ub:'ubicación',hist:'motivo clínico',desc:'patología a descartar'};document.getElementById('voiceMissing').innerHTML=miss.map(k=>`<div class="miss-item">⚠️ No detectado: ${labels[k]||k}</div>`).join('');const qs=[];if(miss.includes('ub'))qs.push('¿Dónde está ubicado el paciente?');if(miss.includes('desc'))qs.push('¿Qué patología se quiere descartar?');if(miss.includes('estudio'))qs.push('¿Qué estudio radiológico solicita?');document.getElementById('voiceQuestions').innerHTML=qs.map(q=>`<div class="q-item">❓ ${esc(q)}</div>`).join('');sv('voiceOut',buildVoiceMessage(r));}
+function applyVoice(){const r=voiceParsed;if(!Object.keys(r).length){toast('Analiza primero');return;}if(r.serv?.value&&D.services.find(s=>s.n===r.serv.value))sv('cServicio',r.serv.value);if(r.edad?.value)sv('cEdad',r.edad.value);if(r.cedula?.value)sv('cCedula',r.cedula.value);if(r.ub?.value)sv('cUbicacion',r.ub.value);if(r.hist?.value)sv('cHistoria',r.hist.value);if(r.desc?.value)sv('cDescartar',r.desc.value);if(r.canaliz?.value)sv('cCanaliz',r.canaliz.value);if(r.px?.value)sv('cPaciente',r.px.value);if(r.algC?.value==='Sin alergia')sv('cAlergia','Sin alergia');if(r.creat?.value){labState['cre']=r.creat.value;updateLabBtn('cre');renderLabActive();}if(r.dimero?.value&&!labState['dim']){labState['dim']='on';updateLabBtn('dim');renderLabActive();}if(r.estudio?.value)addCStudy(r.estudio.value);validate();buildCase();goV('vCaso',0);toast('Aplicado al caso — revisá los campos marcados');}
+function clearVoice(){sv('voiceTxt','');sv('voiceOut','');voiceParsed={};document.getElementById('voiceResultCard').style.display='none';}
+
+/* CALENDARIO DE TURNOS */
+let calY=new Date().getFullYear(),calM=new Date().getMonth(),selDay=null;
+function prevMonth(){calM--;if(calM<0){calM=11;calY--;}selDay=null;closeDay();renderCal();}
+function nextMonth(){calM++;if(calM>11){calM=0;calY++;}selDay=null;closeDay();renderCal();}
+function isHoliday(y,m,d){return(PANAMA_HOLIDAYS[y]||[]).includes(dateKey(y,m,d));}
+function dayKind(ov){return (ov&&ov.kind)||(ov&&ov.turno===true?'turno':null);}
+function getDayInfo(y,m,d){const key=dateKey(y,m,d),ov=D.shiftDays[key]||{};const dt=new Date(y,m,d),dow=dt.getDay();const wk=(dow===0||dow===6),hol=isHoliday(y,m,d);const kind=dayKind(ov);const turno=kind==='turno',libre=kind==='libre',vac=kind==='vacaciones';const prevKind=dayKind(D.shiftDays[dateKey(y,m,d-1)]||{});const post=prevKind==='turno'&&!libre&&!vac;const is24=wk||hol;const plantActive=(!wk&&!hol&&!libre&&!vac);return{key,wk,hol,kind,turno,libre,vac,post,is24,hours:turno?(is24?24:16):0,plantActive,pay:ov.pay||'N',notes:ov.notes||''};}
+function renderCal(){
+  const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  document.getElementById('calTitle').textContent=`${months[calM]} ${calY}`;
+  const dim=new Date(calY,calM+1,0).getDate(),firstDow=new Date(calY,calM,1).getDay();
+  let tur=0,pag=0,fat=0,hrs=0;
+  let html=['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'].map(d=>`<div class="dow">${d}</div>`).join('');
+  for(let i=0;i<firstDow;i++)html+='<div class="day empty"></div>';
+  for(let d=1;d<=dim;d++){const info=getDayInfo(calY,calM,d);const combo=info.plantActive&&info.turno,fat_=combo||info.post;if(info.turno){tur++;if(info.pay==='P')pag++;hrs+=info.hours;}if(fat_)fat++;html+=`<div class="day${info.wk?' weekend':''}${info.hol?' holiday':''}${info.turno?' hasturno':''}${info.libre?' haslibre':''}${info.vac?' hasvac':''}${selDay===d?' selected':''}" onclick="selectDay(${d})"><div class="num">${d}</div><div class="dtags">${info.hol?'<span class="dtag hol">Fer</span>':''}${info.plantActive?'<span class="dtag pl">P</span>':''}${info.turno?'<span class="dtag t">T</span>':''}${info.libre?'<span class="dtag l">L</span>':''}${info.vac?'<span class="dtag v">V</span>':''}${info.post?'<span class="dtag post">Post</span>':''}${fat_?'<span class="dtag fat">⚡</span>':''}${info.turno?`<span class="dtag ${info.pay==='P'?'paid':'pend'}">${info.pay==='P'?'✓':'⏳'}</span>`:''}</div></div>`;}
+  document.getElementById('calGrid').innerHTML=html;
+  document.getElementById('kTurnos').textContent=tur;
+  document.getElementById('kPagados').textContent=pag;
+  document.getElementById('kFatiga').textContent=fat;
+  document.getElementById('kHoras').textContent=Math.round(hrs)+'h';
+  document.getElementById('kShifts').textContent=tur;
+  renderShiftSummary();
+}
+function renderShiftSummary(){
+  const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
+  const dim=new Date(calY,calM+1,0).getDate();const dows=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+  let turnos=[],hols=[],libres=[],vacs=[];
+  for(let d=1;d<=dim;d++){const info=getDayInfo(calY,calM,d);const dow=dows[new Date(calY,calM,d).getDay()];if(info.turno)turnos.push(`${dow} ${d} · ${info.is24?'24h':'16h'} ${info.pay==='P'?'✓':'⏳'}${info.notes?' — '+info.notes:''}`);if(info.libre)libres.push(`${dow} ${d}`);if(info.vac)vacs.push(`${dow} ${d}`);if(info.hol)hols.push(`${dow} ${d}`);}
+  let h=`<div class="card-title" style="font-size:.95rem">📋 Resumen de ${months[calM]} ${calY}</div>`;
+  if(!turnos.length&&!hols.length&&!libres.length&&!vacs.length)h+='<p class="muted">Sin eventos este mes. Tocá un día para elegir su estado.</p>';
+  if(turnos.length){h+=`<div style="margin-top:6px"><div class="ss-row"><span class="ss-badge t">TURNOS</span><b>${turnos.length} día(s)</b></div>`;turnos.forEach(t=>h+=`<div class="ss-row"><span class="ss-badge t">T</span><span>${esc(t)}</span></div>`);h+='</div>';}
+  if(libres.length){h+=`<div style="margin-top:8px"><div class="ss-row"><span class="ss-badge l">LIBRES</span><span>${libres.length} día(s): ${libres.map(esc).join(' · ')}</span></div></div>`;}
+  if(vacs.length){h+=`<div style="margin-top:8px"><div class="ss-row"><span class="ss-badge v">VACACIONES</span><span>${vacs.length} día(s): ${vacs.map(esc).join(' · ')}</span></div></div>`;}
+  if(hols.length){h+=`<div style="margin-top:8px"><div class="ss-row"><span class="ss-badge h">FERIADOS</span><span>${hols.map(esc).join(' · ')}</span></div></div>`;}
+  document.getElementById('shiftSummary').innerHTML=h;
+}
+function selectDay(d){selDay=(selDay===d?null:d);renderCal();const box=document.getElementById('dayEdit');if(!selDay){box.classList.add('hidden');return;}box.classList.remove('hidden');const info=getDayInfo(calY,calM,d);const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];document.getElementById('dayEditTitle').textContent=`${d} de ${months[calM]} ${calY}${info.hol?' 🎉 Feriado':''}${info.wk?' · fin de semana':''}`;syncDayUI(info);}
+function syncDayUI(info){const t=document.getElementById('sbTurno'),l=document.getElementById('sbLibre'),vc=document.getElementById('sbVac');if(t)t.className='state-btn st-t'+(info.turno?' active':'');if(l)l.className='state-btn st-l'+(info.libre?' active':'');if(vc)vc.className='state-btn st-v'+(info.vac?' active':'');show('turnoExtra',info.turno);if(info.turno){sv('dPago',info.pay);sv('dDur',info.is24?'24h (07–07)':'16h (15–07)');}sv('dNotas',info.notes);}
+function setDayKind(kind){if(!selDay)return;const key=dateKey(calY,calM,selDay);const ov=D.shiftDays[key]||{};const cur=dayKind(ov);if(cur===kind){delete D.shiftDays[key];}else{const n={kind};if(kind==='turno')n.pay=ov.pay||'N';if(ov.notes)n.notes=ov.notes;D.shiftDays[key]=n;}save();renderCal();const info=getDayInfo(calY,calM,selDay);syncDayUI(info);toast(cur===kind?'Día limpiado':({turno:'Turno marcado',libre:'Día libre marcado',vacaciones:'Vacación marcada'}[kind]));}
+function saveDayQuick(){if(!selDay)return;const key=dateKey(calY,calM,selDay);const ov=D.shiftDays[key];if(!ov)return;if(ov.kind==='turno')ov.pay=v('dPago')||'N';const notes=v('dNotas');if(notes)ov.notes=notes;else delete ov.notes;D.shiftDays[key]=ov;save();renderCal();}
+function closeDay(){selDay=null;const b=document.getElementById('dayEdit');if(b)b.classList.add('hidden');}
+function rangeKeys(){const from=v('vacFrom'),to=v('vacTo');if(!from||!to)return null;let d0=new Date(from+'T00:00:00'),d1=new Date(to+'T00:00:00');if(isNaN(d0)||isNaN(d1))return null;if(d1<d0){const t=d0;d0=d1;d1=t;}const keys=[];let cur=new Date(d0);while(cur<=d1){keys.push(dateKey(cur.getFullYear(),cur.getMonth(),cur.getDate()));cur.setDate(cur.getDate()+1);}return keys;}
+function markVacationRange(){const keys=rangeKeys();if(!keys){toast('Elegí fecha desde y hasta');return;}keys.forEach(key=>{const ov=D.shiftDays[key]||{};ov.kind='vacaciones';delete ov.pay;D.shiftDays[key]=ov;});save();renderCal();toast(`${keys.length} día(s) marcados como vacaciones 🟣`);}
+function clearVacationRange(){const keys=rangeKeys();if(!keys){toast('Elegí fecha desde y hasta');return;}let n=0;keys.forEach(key=>{if(D.shiftDays[key]&&dayKind(D.shiftDays[key])==='vacaciones'){delete D.shiftDays[key];n++;}});save();renderCal();toast(`${n} día(s) de vacaciones quitados`);}
+function copyShiftSummary(){const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];const dim=new Date(calY,calM+1,0).getDate();const dows=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];let tur=[],pag=0,hrs=0,hols=[],libres=[],vacs=[];for(let d=1;d<=dim;d++){const info=getDayInfo(calY,calM,d);const dow=dows[new Date(calY,calM,d).getDay()];if(info.turno){tur.push(`• ${dow} ${d}${info.hol?' 🎉':''} ${info.is24?'07-07 (24h)':'15-07 (16h)'} ${info.pay==='P'?'✅ pagado':'⏳ pend'}${info.notes?' — '+info.notes:''}`);if(info.pay==='P')pag++;hrs+=info.hours;}if(info.libre)libres.push(`${dow} ${d}`);if(info.vac)vacs.push(`${dow} ${d}`);if(info.hol)hols.push(`${dow} ${d}`);}let lines=[`📅 *TURNOS ${months[calM].toUpperCase()} ${calY}*`,'',`🔴 Turnos: ${tur.length} · ✅ Pagados: ${pag} · ⏱️ Horas: ${Math.round(hrs)}h`,''];lines=lines.concat(tur.length?tur:['Sin turnos marcados.']);if(libres.length)lines.push('',`🟢 Días libres: ${libres.join(' · ')}`);if(vacs.length)lines.push('',`🟣 Vacaciones (${vacs.length} días): ${vacs.join(' · ')}`);if(hols.length)lines.push('',`🟡 Feriados del mes: ${hols.join(' · ')}`);const txt=lines.join('\n');if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(()=>toast('Resumen copiado')).catch(()=>fbCopy(txt));else fbCopy(txt);}
+function fbCopy(txt){try{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Copiado');}catch(e){toast('Copiar manualmente');}}
+
+/* CONFIG CRUD */
+function render(){document.getElementById('kStudies').textContent=D.studies.length;document.getElementById('kHistory').textContent=(D.history||[]).length;renderThemes();renderSvcs();renderStudies();renderMods();renderHistory();renderManual();renderStLabsGrid();fillSelects();validate();buildCase();}
+function renderSvcs(){document.getElementById('svcList').innerHTML=D.services.map((s,i)=>`<div class="item"><div><b>${esc(s.n)}</b><span>${esc(s.t||'')}</span></div><div class="acts"><button class="ib d" onclick="delI('services',${i})">X</button></div></div>`).join('')||'<p class="muted">Sin servicios.</p>';const sel=document.getElementById('cServicio'),cur=sel.value;sel.innerHTML='<option value="">— Seleccionar —</option>'+D.services.map(s=>`<option>${esc(s.n)}</option>`).join('');sel.value=cur;}
+function addSvc(){const n=v('svcName'),t=v('svcType');if(!n)return toast('Falta nombre');D.services.push({n,t});sv('svcName','');sv('svcType','');save();toast('Servicio agregado');}
+function renderStudies(){const f=(v('stFilter')||'').toLowerCase();const list=D.studies.map((s,i)=>({s,i})).filter(({s})=>!f||(s.name+' '+s.modality+' '+s.region).toLowerCase().includes(f));document.getElementById('studyList').innerHTML=list.map(({s,i})=>`<div class="item"><div><b>${esc(s.name)}</b><span>${esc(s.modality)} · ${esc(s.region)} · contraste: ${esc(s.contrast)}${s.labReqs&&s.labReqs.length?'<br>🧪 labs: '+s.labReqs.map(r=>labById(r.lab)?.ab||r.lab).join(', '):''}</span></div><div class="acts"><button class="ib d" onclick="delI('studies',${i})">X</button></div></div>`).join('')||'<p class="muted">Sin estudios.</p>';}
+function renderStLabsGrid(){const g=document.getElementById('stLabsGrid');if(!g)return;g.innerHTML=LABS.map(l=>`<button type="button" class="lab-btn${stLabReqs.includes(l.id)?' on':''}" data-stlab="${l.id}" onclick="toggleStLab('${l.id}')">${esc(l.ab)}</button>`).join('');}
+function toggleStLab(id){if(stLabReqs.includes(id))stLabReqs=stLabReqs.filter(x=>x!==id);else stLabReqs.push(id);renderStLabsGrid();}
+function addStudy(){const cont=v('stContrast'),o={name:v('stName'),modality:v('stMod'),region:v('stRegion'),contrast:cont,priority:v('stPri'),ind:v('stInd'),reqs:U.slice()};if(!o.name)return toast('Falta nombre');if(/yodado|bario/i.test(cont))o.reqs.push('alergia_contraste','creatinina','canalizacion');if(/gadolinio/i.test(cont))o.reqs.push('rm_safety','gadolinio_renal','canalizacion');if(o.modality&&o.modality.includes('RM')&&!o.reqs.includes('rm_safety'))o.reqs.push('rm_safety');if(stLabReqs.length)o.labReqs=stLabReqs.map(lab=>({lab,cond:'always',level:'yellow',note:'Requerido por protocolo local para este estudio.'}));D.studies.push(o);['stName','stRegion','stInd'].forEach(id=>sv(id,''));stLabReqs=[];renderStLabsGrid();save();toast('Estudio agregado');}
+function renderMods(){
+  document.getElementById('modList').innerHTML=D.modalities.map((m,i)=>{
+    const sect=(cls,icon,title,txt)=>txt?`<div class="mod-sect"><div class="ms-t ${cls}">${icon} ${title}</div><p>${esc(txt)}</p></div>`:'';
+    return`<div class="mod-card" id="mc${i}"><div class="mod-head" onclick="document.getElementById('mc${i}').classList.toggle('open')"><div class="mh-l"><span class="tag">${esc(m.ion||'')} · ${esc(m.nature||'')}</span><b>${esc(m.name)}</b></div><span class="chev">▾</span></div><div class="mod-body">${m.desc?`<p class="mdesc">${esc(m.desc)}</p>`:''}${sect('use','✅','Cuándo usarla',m.when)}${sect('avoid','🚫','Cuándo NO',m.whenNot)}${sect('uniq','⭐','Característica única',m.unique)}${sect('contra','⚠️','Contraindicaciones',m.contra)}${sect('prep','📋','Preparación',m.prep)}</div></div>`;
+  }).join('');
+  const sel=document.getElementById('stMod');if(sel)sel.innerHTML=D.modalities.map(m=>`<option>${esc(m.name)}</option>`).join('');
+}
+function delI(arr,i){D[arr].splice(i,1);save();toast('Eliminado');}
+function fillSelects(){renderSvcs();renderMods();}
+
+/* EXPORT */
+function exportConfig(){const ex={theme:D.theme,services:D.services,studies:D.studies,modalities:D.modalities};const blob=new Blob([JSON.stringify(ex,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download='radflow_config.json';a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast('Configuración exportada');}
+function importConfig(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const obj=JSON.parse(r.result);['services','studies','modalities'].forEach(k=>{if(obj[k])D[k]=obj[k];});if(obj.theme){D.theme=obj.theme;applyTheme(obj.theme);}save();toast('Configuración importada');}catch(e){toast('Archivo inválido');}};r.readAsText(f);}
+function resetAll(){if(confirm('¿Restaurar fábrica? Se conservan historial y turnos.')){const h=D.history,sd=D.shiftDays;D=clone(baseData());D.history=h;D.shiftDays=sd;applyTheme('clinico');save();toast('Restaurado');}}
+function exportPatientsExcel(){
+  let rows=(D.history||[]).slice();const range=v('expRange');
+  if(range==='range'){const from=v('expFrom'),to=v('expTo');if(from){const t0=new Date(from+'T00:00:00').getTime();rows=rows.filter(r=>r.ts>=t0);}if(to){const t1=new Date(to+'T23:59:59').getTime();rows=rows.filter(r=>r.ts<=t1);}}
+  if(!rows.length){toast('No hay pacientes en ese período');return;}
+  rows.sort((a,b)=>b.ts-a.ts);
+  const headers=['#','Fecha','Estado','Servicio','Paciente','Cédula','Edad','Sexo','Ubicación','Estudios','Descartar','Labs','Pendientes'];
+  const style=`<style>table{border-collapse:collapse;font-family:Calibri,Arial,sans-serif;font-size:11pt}caption{font-size:15pt;font-weight:bold;color:#0d2e41;padding:10px;text-align:left}th{background:#0d2e41;color:#fff;font-weight:bold;padding:8px 10px;border:1px solid #0a2230;text-align:left}td{padding:6px 10px;border:1px solid #cdd7de;vertical-align:top}tr:nth-child(even) td{background:#eef4f7}.st-red{color:#c0392b;font-weight:bold}.st-green{color:#1f9d55;font-weight:bold}.st-org{color:#d97706;font-weight:bold}.st-yel{color:#b8860b;font-weight:bold}.st-blk{color:#2c3e50;font-weight:bold}</style>`;
+  const stC=s=>/LISTO/.test(s)?'st-green':/crítica/.test(s)?'st-red':/preparación/.test(s)?'st-org':/no crítica/.test(s)?'st-yel':'st-blk';
+  const body=rows.map((r,i)=>{const p=r.px||{};return`<tr><td>${i+1}</td><td>${esc(r.date)}</td><td class="${stC(r.status||'')}">${esc(r.status||'')}</td><td>${esc(r.serv||'')}</td><td>${esc(p.n||'—')}</td><td>${esc(p.ced||'—')}</td><td>${esc(p.edad||'')}</td><td>${esc(p.sexo||'')}</td><td>${esc(p.ub||'')}</td><td>${esc((r.studies||[]).join(', '))}</td><td>${esc(r.desc||'')}</td><td>${esc(r.labs||'')}</td><td>${esc((r.pending||[]).join(' | '))}</td></tr>`;}).join('');
+  const html=`<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel"><head><meta charset="UTF-8">${style}</head><body><table><caption>RadFlow Guard — Historial de Pacientes · ${fmtDate(new Date())} · ${rows.length} registros</caption><thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead><tbody>${body}</tbody></table></body></html>`;
+  const blob=new Blob(['\ufeff'+html],{type:'application/vnd.ms-excel'});const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=`radflow_pacientes_${range==='range'?'periodo':'completo'}_${new Date().toISOString().slice(0,10)}.xls`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);toast(`Excel con ${rows.length} pacientes descargado`);
+}
+
+/* MANUAL */
+function renderManual(){document.getElementById('manualContent').innerHTML=`<div class="card-title" style="font-size:1.3rem">Manual · RadFlow Guard</div><p class="muted">Organizador de solicitudes radiológicas</p><div class="div"></div>
+<h4>¿Qué hace?</h4><p><b>Organiza, recuerda, valida y comunica.</b> Recibe una solicitud radiológica, revisa los prerrequisitos del estudio y genera el mensaje para WhatsApp. No decide si el estudio se hace — eso lo decide el residente.</p>
+<h4>¿Qué NO hace?</h4><ul><li>No es historia clínica oficial ni diagnóstica.</li><li>No rechaza pacientes — dice "no listo" o "validación superior".</li></ul>
+<h4>Flujo del caso</h4><ul><li><b>1 Origen:</b> servicio y médico que presenta.</li><li><b>2 Paciente:</b> datos básicos y alergia.</li><li><b>3 Clínica:</b> historia y examen.</li><li><b>4 Estudios:</b> buscador filtrable — escribí "TC", "abdomen" o la modalidad. Podés agregar varios estudios.</li><li><b>5 Laboratorios:</b> tocá la abreviación para activar; los <b>sugeridos por el estudio se resaltan con ★ y borde de color</b>. Escribí el valor (la unidad se agrega sola). "🩸 Panel triage" despliega los labs de un panel para llenarlos de una vez.</li><li><b>6 Requisitos del estudio:</b> solo los exámenes <b>condicionales</b> que dependen del estudio (ej: β-hCG si mujer + contraste, creatinina para contraste, lipasa si pancreatitis).</li><li><b>7 Seguridad:</b> campos que aparecen según el estudio, más el consentimiento informado (firmado / no firmado).</li><li><b>Alerta:</b> al final, antes de copiar, te dice qué falta.</li><li><b>8 WhatsApp:</b> elegí plantilla y copiá.</li></ul>
+<h4>El semáforo de alerta</h4><div class="lgd"><div><span class="chip" style="background:var(--gbg)">🟢</span><div><b>Listo</b></div></div><div><span class="chip" style="background:var(--ybg)">🟡</span><div><b>Falta no crítica</b></div></div><div><span class="chip" style="background:var(--obg)">🟠</span><div><b>Requiere preparación</b></div></div><div><span class="chip" style="background:var(--rbg)">🔴</span><div><b>Falta crítica</b></div></div><div><span class="chip" style="background:var(--bbg)">⚫</span><div><b>Validación superior</b></div></div></div>
+<h4>Voz</h4><p>Dos modos: <b>Pegar/escribir</b> o <b>Dictado por voz</b> (pide permiso de micrófono una vez; mientras escucha verás un indicador rojo animado con cronómetro y el texto en vivo). "Analizar" extrae los campos y arma una <b>solicitud lista para copiar</b>. "Aplicar al caso" llena el formulario. <b>Revisá siempre.</b> El dictado funciona mejor en Chrome con conexión.</p>
+<h4>Turnos</h4><p>Tocá un día y elegí su estado: <b style="color:var(--red)">Turno</b> (T, rojo), <b style="color:var(--green)">Libre</b> (L, verde, día de descanso) o <b style="color:#7c3aed">Vacación</b> (V, morado). La <b style="color:#1a6b7a">"P"</b> indica planta automática en días hábiles (no aparece en días libres ni de vacaciones). Turno L-V: 15:00–07:00 (16h). Finde/feriado: 07:00–07:00 (24h) — calculado solo. Para <b>vacaciones largas</b> usá "🌴 Vacaciones por rango": elegí desde-hasta y marca todo el periodo de una vez. Feriados de Panamá 2025–2027 pre-cargados en amarillo. El <b>resumen del mes</b> (turnos rojos, libres verdes, vacaciones moradas, feriados amarillos) se actualiza al cambiar de mes. "Copiar resumen mensual" arma el reporte completo.</p>
+<h4>Resúmenes</h4><p>Genera informes radiológicos profesionales. Elegí un <b>paciente</b> (el caso actual, uno del historial, o nuevo en blanco) y el <b>tipo de resumen</b>: <b>Informe Estructurado</b> (estándar RSNA: indicación, técnica, hallazgos, impresión), <b>Entrega de Turno (SBAR)</b>, <b>Presentación Docente</b> o <b>Interconsulta</b>. El módulo <b>autocompleta</b> lo que ya tenías del reporte (paciente, estudios, indicación, labs, pendientes) y dejás listo lo que falta. Los campos <b>críticos</b> (hallazgo urgente, impresión, conclusión) se resaltan en rojo. Abajo exportás en <b>Word</b> y <b>Excel</b> con diseño profesional, cuadros y lo crítico en rojo, o copiás el texto. Podés guardar resúmenes para reabrirlos después.</p>
+<h4>Temas</h4><p>6 apariencias en Config → Tema. <b>Nocturno</b> es modo oscuro para guardias. Se guarda en el dispositivo.</p>
+<h4>Datos</h4><ul><li><b>Exportar config:</b> servicios, estudios y modalidades en JSON.</li><li><b>Exportar pacientes (Excel):</b> historial con encabezados y colores. Elegí "Toda la data" o un período.</li></ul>
+<h4>Modalidades (Config)</h4><p>Tocá cada modalidad para ver cuándo usarla, cuándo no, su característica única y contraindicaciones. Es material de consulta para la residencia.</p>
+<div class="manual-footer">With love 4 Karol ❤️</div>`;}
+
+/* LISTENERS */
+['cServicio','cMedico','cExt','cPaciente','cCedula','cEdad','cSexo','cUbicacion','cApp','cApqx','cAlergia','cTraslado','cHistoria','cExamen','cDescartar','cCanaliz','cRmSafety','cEmbarazo','cPrep','cConsent','cCoag','cOtros','cValidacion','cImagenPrevia'].forEach(id=>{const e=document.getElementById(id);if(e){const fn=()=>{validate();buildCase();if(id==='cSexo'){renderDynReqs();refreshLabSuggestions();}};e.addEventListener('input',fn);e.addEventListener('change',fn);}});
+document.getElementById('stFilter').addEventListener('input',renderStudies);
+
+/* INIT */
+applyTheme(D.theme||'clinico');
+initLabs();render();renderChips();updateSec();buildCase();
+</script>
+</body>
+</html>
