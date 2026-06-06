@@ -130,6 +130,14 @@ body[data-dark="1"] .lab-btn.suggested{color:var(--ink)}
 /* ===== CONTRASTE (Caso) ===== */
 .ct-block{background:var(--soft2,rgba(0,0,0,.025));border:1px solid var(--line);border-radius:11px;padding:10px 12px;margin-top:9px}
 .ct-title{font-weight:800;font-size:.82rem;color:var(--teal);margin-bottom:7px}
+/* Sección 7: amarillo suave cuando NO está marcado el check */
+#secContraste.ct-pending{background:rgba(245,200,70,.16)!important;border-color:rgba(230,180,40,.6)!important}
+.ct-check{display:flex;align-items:center;gap:9px;font-size:.9rem;cursor:pointer;padding:4px 0}
+.ct-check input{width:20px;height:20px;flex-shrink:0}
+/* Fix desborde del reloj/inputs en teléfono */
+#ctFields input,#ctFields select,.ct-block input,.ct-block select{width:100%;box-sizing:border-box;min-width:0;max-width:100%}
+.g2>div{min-width:0}
+input[type="time"]{box-sizing:border-box;max-width:100%}
 .phase-box{display:flex;flex-wrap:wrap;gap:5px;margin:7px 0}
 .phase-chip{background:var(--navy);color:#fff;border-radius:14px;padding:4px 10px;font-size:.72rem;font-weight:600}
 .phase-note{flex-basis:100%;font-size:.74rem;color:var(--soft);margin-top:3px}
@@ -195,8 +203,8 @@ body[data-dark="1"] .lab-btn.suggested{color:var(--ink)}
 
 /* CALENDARIO */
 .cal-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
-.cal-kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
-@media(max-width:500px){.cal-kpis{grid-template-columns:repeat(2,1fr)}}
+.cal-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:12px}
+@media(max-width:500px){.cal-kpis{grid-template-columns:repeat(3,1fr)}}
 .ck{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:9px;text-align:center}
 .ck b{display:block;font-size:1.1rem;font-weight:800;color:var(--ink);font-family:var(--font-head)}.ck span{font-size:.64rem;color:var(--soft)}
 .cal{display:grid;grid-template-columns:repeat(7,1fr);gap:3px}
@@ -381,26 +389,29 @@ body[data-dark="1"] .lab-btn.suggested{color:var(--ink)}
   </div>
 
   <div class="card hidden" id="secContraste"><h3><span class="n">7</span> 🕐 Contraste y tiempos</h3>
-    <p class="muted" style="margin:-4px 0 6px">Aparece para estudios con contraste. Registrá los tiempos — alimenta el resumen de guardia y las alertas.</p>
-    <label>Tipo de contraste</label>
-    <select id="cContrastTipo"><option value="">— Seleccionar —</option><option>Oral</option><option>Endovenoso</option><option>Ambos</option></select>
-    <div id="ctOral" class="hidden ct-block">
-      <div class="ct-title">💧 Contraste oral</div>
-      <div class="g2">
-        <div><label>Hora inicio (empezó a tomar)</label><input id="cOralInicio" type="time"></div>
-        <div><label>¿Terminó?</label><select id="cOralEstado"><option value="">—</option><option>Terminó</option><option>No terminó</option></select></div>
+    <label class="ct-check"><input type="checkbox" id="cContrastAdd"> <b>Agregar tiempos de contraste al reporte</b></label>
+    <p class="muted" id="ctHint" style="margin:6px 0 0">Marcá la casilla solo si vas a registrar los tiempos de inyección/toma del contraste. Si la marcás, se agregan al modelo servicio y al resumen rápido, y se activan las alertas.</p>
+    <div id="ctFields" class="hidden" style="margin-top:10px">
+      <label>Tipo de contraste</label>
+      <select id="cContrastTipo"><option value="">— Seleccionar —</option><option>Oral</option><option>Endovenoso</option><option>Ambos</option></select>
+      <div id="ctOral" class="hidden ct-block">
+        <div class="ct-title">💧 Contraste oral</div>
+        <div class="g2">
+          <div><label>Hora inicio (empezó a tomar)</label><input id="cOralInicio" type="time"></div>
+          <div><label>¿Terminó?</label><select id="cOralEstado"><option value="">—</option><option>Terminó</option><option>No terminó</option></select></div>
+        </div>
+        <div id="ctOralFin" class="hidden"><label>Hora que terminó</label><input id="cOralFin" type="time"></div>
+        <div id="ctOralRetiro" class="hidden"><label>Hora que retiró el contraste</label><input id="cOralRetiro" type="time"></div>
+        <label>Hora de scan (se pide) <span class="muted">— auto: inicio +60min, editable</span></label><input id="cScanHora" type="time">
+        <p class="muted" style="margin-top:4px">⏰ Te avisa cuando llegue la hora del scan.</p>
       </div>
-      <div id="ctOralFin" class="hidden"><label>Hora que terminó</label><input id="cOralFin" type="time"></div>
-      <div id="ctOralRetiro" class="hidden"><label>Hora que retiró el contraste</label><input id="cOralRetiro" type="time"></div>
-      <label>Hora de scan (se pide) <span class="muted">— auto: inicio +60min, editable</span></label><input id="cScanHora" type="time">
-      <p class="muted" style="margin-top:4px">⏰ Te avisa cuando llegue la hora del scan.</p>
-    </div>
-    <div id="ctEv" class="hidden ct-block">
-      <div class="ct-title">💉 Contraste endovenoso</div>
-      <label>Protocolo</label><select id="cEvProtocolo"><option value="">— Protocolo —</option></select>
-      <div id="ctEvPhases"></div>
-      <label>Hora de inyección</label><input id="cEvHora" type="time">
-      <p class="muted" style="margin-top:4px">⏰ Te avisa en cada fase tardía (3/7/10/15 min).</p>
+      <div id="ctEv" class="hidden ct-block">
+        <div class="ct-title">💉 Contraste endovenoso</div>
+        <label>Protocolo</label><select id="cEvProtocolo"><option value="">— Protocolo —</option></select>
+        <div id="ctEvPhases"></div>
+        <label>Hora de inyección</label><input id="cEvHora" type="time">
+        <p class="muted" style="margin-top:4px">⏰ Te avisa en cada fase tardía (3/7/10/15 min).</p>
+      </div>
     </div>
   </div>
 
@@ -427,8 +438,9 @@ body[data-dark="1"] .lab-btn.suggested{color:var(--ink)}
   <div class="card"><h3><span class="n">9</span> WhatsApp</h3>
     <div class="ttabs">
       <button class="ttab active" data-tpl="service">Modelo servicio</button>
-      <button class="ttab" data-tpl="quick">Resumen rápido del paciente</button>
+      <button class="ttab" data-tpl="quick">Resumen rápido de pacientes</button>
     </div>
+    <p class="copy-hint" id="quickHint" style="display:none;text-align:left">📲 Cada paciente que guardás/compartís se va apilando acá, separado por barras. Se reinicia al copiar, enviar o vaciar.</p>
     <textarea id="caseOut" class="out" readonly></textarea>
     <p class="copy-hint">📋 <b>Copiar</b> es lo más estable. WhatsApp es opcional. Si falla copiar → "Seleccionar" y mantené presionado.</p>
     <div class="br3">
@@ -437,6 +449,7 @@ body[data-dark="1"] .lab-btn.suggested{color:var(--ink)}
       <button class="btn gn" onclick="openWA('caseOut')">💬 WhatsApp</button>
     </div>
     <button class="btn pu" style="margin-top:7px" onclick="sendToBandeja()">📝 Enviar a resumen de turno/planta</button>
+    <button class="btn gh" id="btnVaciarQuick" style="margin-top:7px;display:none" onclick="clearQuickStack()">🧹 Vaciar resumen de pacientes</button>
     <div class="br3" style="margin-top:7px">
       <button class="btn nv" onclick="savePx(true)">💾 Guardar</button>
       <button class="btn nv" onclick="savePx(false)">🕶️ Sin datos</button>
@@ -527,6 +540,7 @@ body[data-dark="1"] .lab-btn.suggested{color:var(--ink)}
       <div class="card-title">📄 Informes profesionales</div>
       <p class="muted" style="margin-bottom:11px">Elegí un paciente del registro y el tipo de informe. Se autocompleta con lo que ya tenés.</p>
       <label>1 · Paciente</label>
+      <select id="sumFilter" onchange="renderSummaryPicker()" style="margin-bottom:7px"><option value="all">Todos los del registro</option><option value="turno">🌙 Solo turno</option><option value="planta">☀️ Solo planta</option></select>
       <select id="sumPatient" onchange="pickSummaryPatient()"></select>
       <label style="margin-top:11px">2 · Tipo de informe</label>
       <div id="sumTypeGrid" class="sum-type-grid"></div>
@@ -549,7 +563,6 @@ body[data-dark="1"] .lab-btn.suggested{color:var(--ink)}
     </div>
     <div class="cal-kpis">
       <div class="ck"><b id="kTurnos">0</b><span>turnos</span></div>
-      <div class="ck"><b id="kPagados">0</b><span>pagados</span></div>
       <div class="ck"><b id="kFatiga">0</b><span>alertas fatiga</span></div>
       <div class="ck"><b id="kHoras">0h</b><span>horas turno</span></div>
     </div>
@@ -566,8 +579,7 @@ body[data-dark="1"] .lab-btn.suggested{color:var(--ink)}
       <button class="state-btn st-v" id="sbVac" onclick="setDayKind('vacaciones')">🟣 Vacación</button>
     </div>
     <div id="turnoExtra" class="hidden">
-      <div class="g2" style="margin-top:9px">
-        <div><label>Pago del turno</label><select id="dPago" onchange="saveDayQuick()"><option value="N">Pendiente</option><option value="P">Pagado</option><option value="X">No aplica</option></select></div>
+      <div style="margin-top:9px">
         <div><label>Duración</label><input id="dDur" readonly></div>
       </div>
     </div>
@@ -662,6 +674,7 @@ body[data-dark="1"] .lab-btn.suggested{color:var(--ink)}
       <label>Indicación</label><input id="protoInd" placeholder="Ej: Masa renal / hematuria">
       <label>Fases (una por línea)</label><textarea id="protoPhases" rows="4" placeholder="Simple&#10;Corticomedular (≈ arterial)&#10;Nefrográfico 80-90s&#10;Tardía 10min"></textarea>
       <label>Nota (opcional)</label><input id="protoNote" placeholder="Aclaración del protocolo">
+      <label>Contexto: para qué / cuándo (opcional)</label><textarea id="protoCtx" rows="2" placeholder="Para qué sirve y cuándo se indica"></textarea>
       <button class="btn gn" style="margin-top:10px" onclick="addProto()">➕ Agregar protocolo</button>
     </div>
     <div class="card">
@@ -938,6 +951,7 @@ const SEED_STUDIES = [
   S('AngioTC de aorta','TC (Tomografía)','Tórax/Abdomen','Sí (yodado)','Alta','Disección, aneurisma, ruptura aórtica.',['alergia_contraste','creatinina','canalizacion','via_antecubital','signos_vitales','paciente_inestable']),
   S('TC columna','TC (Tomografía)','Columna','No','Media','Trauma, fractura, valoración ósea detallada.',['signos_vitales']),
   S('TC trauma / politrauma (body)','TC (Tomografía)','Cuerpo completo','Sí (yodado)','Alta','Politraumatizado, trauma mayor de alta energía.',['alergia_contraste','creatinina','canalizacion','signos_vitales','paciente_inestable']),
+  S('Panscan (politrauma)','TC (Tomografía)','Tórax-abdomen-pelvis','Sí (yodado)','Alta','Politrauma de alta energía. TC de cuerpo: tórax/abdomen/pelvis sin y con contraste (arterial T-A-P + venoso T-A-P + tardío 3min, tardío 10min de abdomen y pelvis). Máx 400 lb. Si la sonda no está clampeada, el contraste se va por la sonda y no pinta.',['alergia_contraste','creatinina','canalizacion','signos_vitales','paciente_inestable']),
   S('TC articular / extremidad','TC (Tomografía)','Variable','No','Baja','Fractura compleja, valoración prequirúrgica articular.'),
 
   /* ============ ULTRASONIDO ============ */
@@ -1099,17 +1113,17 @@ const PANAMA_HOLIDAYS = {
    PROTOCOLOS DE CONTRASTE EV — de las notas del CHDr AAM (editables)
    ==================================================================== */
 const SEED_PROTOCOLS = [
-  {name:'Panscan (politrauma)', ind:'Politrauma', phases:['Arterial T-A-P','Venoso T-A-P','Tardío 3min T-A-P','Tardío 10min solo abdomen y pelvis'], note:'Máx 400 lb. Si la sonda no está clampeada, el contraste se va por la sonda y no pinta.'},
-  {name:'Apendicitis / Obstrucción / Diverticulitis / Colección', ind:'Abdomen inflamatorio agudo', phases:['Simple','Venoso','Tardío 7min (10min si creatinina elevada)'], note:''},
-  {name:'AngioTC por sangrado', ind:'Sangrado abdominal activo', phases:['Arterial temprano','Venoso','Tardío 3min'], note:''},
-  {name:'AngioTC x TEP', ind:'Tromboembolismo pulmonar', phases:['Simple','Arterial temprano de la pulmonar','Venoso'], note:''},
-  {name:'Cuatrifásico (abdomen superior)', ind:'Lesión hepática / hígado', phases:['Simple','Arterial tardío de abdomen superior (hasta crestas iliacas)','Portal de abdomen superior (hasta crestas iliacas)','Venoso','Tardío 7 a 10min'], note:'Estudio de abdomen superior.'},
-  {name:'Cistoct / Coloct', ind:'Vejiga / colostomía', phases:['Cistoct: en bolsa de 500cc inyecto 15cc','Coloct: cortar extremo distal del cable, 500cc de SSN + 30cc de contraste'], note:''},
-  {name:'Hematoma retroperitoneal', ind:'Hematoma retroperitoneal', phases:['Simple','Arterial temprano (angio)','Venoso','Tardío 3min'], note:''},
-  {name:'Sangrado en tórax / aorta / SAA', ind:'Síndrome aórtico agudo', phases:['Simple','Arterial temprano','Venoso','Tardío 3min'], note:''},
-  {name:'Protocolo renal', ind:'Masa renal / hematuria', phases:['Simple abdomen-pelvis','Corticomedular (≈ arterial)','Nefrográfico 80-90s (≈ venoso)','Tardía 10min'], note:''},
-  {name:'Glándulas suprarrenales', ind:'Masa suprarrenal', phases:['Simple abdomen-pelvis','Venoso','Tardío 15min (si UH < 10 es adenoma y no requiere)'], note:''},
-  {name:'AngioTC miembros inferiores', ind:'Isquemia / vascular MMII', phases:['Simple','Arterial','Venoso','Tardío 3min'], note:''}
+  {name:'Panscan (politrauma)', ind:'Politrauma', phases:['Arterial T-A-P','Venoso T-A-P','Tardío 3min T-A-P','Tardío 10min solo abdomen y pelvis'], note:'Máx 400 lb. Si la sonda no está clampeada, el contraste se va por la sonda y no pinta.', ctx:'Para qué: detectar lesión de órgano sólido, sangrado activo y lesión vascular en trauma mayor. Cuándo: politrauma de alta energía. El tardío de la pelvis busca lesión de vía urinaria/vejiga.'},
+  {name:'Apendicitis / Obstrucción / Diverticulitis / Colección', ind:'Abdomen inflamatorio agudo', phases:['Simple','Venoso','Tardío 7min (10min si creatinina elevada)'], note:'', ctx:'Para qué: la fase venosa (60-70s) da el mejor realce de la pared intestinal y órganos sólidos. La simple muestra la grasa inflamatoria. Cuándo: dolor abdominal agudo, sospecha inflamatoria/infecciosa.'},
+  {name:'AngioTC por sangrado', ind:'Sangrado abdominal activo', phases:['Arterial temprano','Venoso','Tardío 3min'], note:'', ctx:'Para qué: la simple distingue sangre densa de lo que realza; la arterial detecta sangrado arterial activo; la venosa/tardía muestra el contraste acumulándose en la luz (sangrado lento). Detecta hasta 0.3–0.5 mL/min. NO dar contraste oral (obscure el sangrado).'},
+  {name:'AngioTC x TEP', ind:'Tromboembolismo pulmonar', phases:['Simple','Arterial temprano de la pulmonar','Venoso'], note:'', ctx:'Para qué: opacificar las arterias pulmonares para ver el trombo. Cuándo: sospecha de TEP. La fase se sincroniza a la arteria pulmonar.'},
+  {name:'Cuatrifásico (abdomen superior)', ind:'Lesión hepática / hígado', phases:['Simple','Arterial tardío de abdomen superior (hasta crestas iliacas)','Portal de abdomen superior (hasta crestas iliacas)','Venoso','Tardío 7 a 10min'], note:'Estudio de abdomen superior.', ctx:'Para qué: caracterizar lesión hepática. El HCC realza en arterial y hace "washout" (se ve oscuro) en portal/tardío, con cápsula que realza. Por eso se necesitan varias fases.'},
+  {name:'Cistoct / Coloct', ind:'Vejiga / colostomía', phases:['Cistoct: en bolsa de 500cc inyecto 15cc','Coloct: cortar extremo distal del cable, 500cc de SSN + 30cc de contraste'], note:'', ctx:'Para qué: opacificar vejiga (cistoTC) o colon/ostomía con contraste instilado. Cuándo: sospecha de fuga/ruptura vesical o evaluación de colostomía.'},
+  {name:'Hematoma retroperitoneal', ind:'Hematoma retroperitoneal', phases:['Simple','Arterial temprano (angio)','Venoso','Tardío 3min'], note:'', ctx:'Para qué: ver si el hematoma tiene sangrado activo. La arterial detecta extravasación; la tardía confirma sangrado lento.'},
+  {name:'Sangrado en tórax / aorta / SAA', ind:'Síndrome aórtico agudo', phases:['Simple','Arterial temprano','Venoso','Tardío 3min'], note:'', ctx:'Para qué: descartar disección/aneurisma/ruptura aórtica. La simple ve hematoma intramural; la arterial define la luz y el flap.'},
+  {name:'Protocolo renal', ind:'Masa renal / hematuria', phases:['Simple abdomen-pelvis','Corticomedular (≈ arterial)','Nefrográfico 80-90s (≈ venoso)','Tardía 10min'], note:'', ctx:'Para qué: en la fase nefrográfica (~90s) todo el riñón realza parejo y se detectan carcinomas renales pequeños. El tardío evalúa la vía excretora.'},
+  {name:'Glándulas suprarrenales', ind:'Masa suprarrenal', phases:['Simple abdomen-pelvis','Venoso','Tardío 15min (si UH < 10 es adenoma y no requiere)'], note:'', ctx:'Para qué: washout adrenal (simple + venoso 60-70s + tardío 15min). Washout absoluto ≥60% = adenoma benigno; <60% = indeterminado. En simple, <10 UH ya sugiere adenoma rico en grasa.'},
+  {name:'AngioTC miembros inferiores', ind:'Isquemia / vascular MMII', phases:['Simple','Arterial','Venoso','Tardío 3min'], note:'', ctx:'Para qué: mapear el árbol arterial de las piernas (estenosis, oclusión, trauma vascular). Cuándo: isquemia, claudicación, trauma de extremidad.'}
 ];
 
 /* CÓDIGOS DE MODALIDAD (para resumen de guardia) — editables */
@@ -1192,10 +1206,13 @@ function buildSrc(){
 function renderSummaryPicker(){
   const sel=document.getElementById('sumPatient');
   if(sel){
+    const filt=(document.getElementById('sumFilter')||{}).value||'all';
     let opts='<option value="current">👉 Caso actual (lo que estás llenando)</option>';
-    (D.registry||[]).forEach((h,i)=>{const who=h.name||'Sin nombre';opts+=`<option value="${i}">${esc(h.date)} · ${esc(who)} · ${esc((h.studies||[]).join(', ').slice(0,40))}</option>`;});
+    (D.registry||[]).forEach((h,i)=>{if(filt!=='all'&&(h.bloque||'')!==filt)return;const who=h.name||'Sin nombre';const bl=h.bloque==='turno'?'🌙':(h.bloque==='planta'?'☀️':'');opts+=`<option value="${i}">${bl} ${esc(h.date)} · ${esc(who)} · ${esc((h.studies||[]).join(', ').slice(0,36))}</option>`;});
     opts+='<option value="new">➕ Nuevo en blanco</option>';
-    sel.innerHTML=opts;sel.value=sumPatient;
+    sel.innerHTML=opts;
+    if(!Array.from(sel.options).some(o=>o.value===String(sumPatient)))sumPatient='current';
+    sel.value=sumPatient;
   }
   const grid=document.getElementById('sumTypeGrid');
   if(grid)grid.innerHTML=SUMMARY_TYPES.map(t=>`<div class="sum-type-card${sumTypeId===t.id?' active':''}" style="--tc:${t.color}" onclick="pickSummaryType('${t.id}')"><div class="stc-icon" style="background:${t.color}">${t.icon}</div><div class="stc-body"><b>${esc(t.name)}</b><span>${esc(t.desc)}</span></div></div>`).join('');
@@ -1440,16 +1457,17 @@ function caseBloque(){
 
 /* ---------- CONTRASTE: lectura de campos del Caso ---------- */
 function getContrastData(){
+  const add=!!(document.getElementById('cContrastAdd')&&document.getElementById('cContrastAdd').checked);
   const tipo=v('cContrastTipo');
-  return{tipo,
+  return{add,tipo,
     oralInicio:v('cOralInicio'),oralFin:v('cOralFin'),oralRetiro:v('cOralRetiro'),
     terminoOral:v('cOralEstado')==='Terminó',
     scanHora:v('cScanHora'),
     evProtocolo:v('cEvProtocolo'),evHora:v('cEvHora')};
 }
-/* Frase exacta que pide el R+ */
+/* Frase exacta que pide el R+ — solo si el médico marcó el check */
 function caseContrastComment(){
-  const cd=getContrastData();if(!cd.tipo)return '';
+  const cd=getContrastData();if(!cd.add||!cd.tipo)return '';
   let parts=[];
   if(cd.tipo==='Oral'||cd.tipo==='Ambos'){
     if(cd.terminoOral&&cd.oralInicio&&cd.oralFin)parts.push(`terminó contraste: inició ${cd.oralInicio}, terminó ${cd.oralFin}${cd.scanHora?', se pide '+cd.scanHora:''}`);
@@ -1478,22 +1496,24 @@ function contrastAlerts(cd){
   }
   return al;
 }
-/* Sección de contraste: mostrar/ocultar según estudio */
+/* Sección de contraste: amarillo si NO está marcado; color del tema si SÍ */
 function updateContrastSection(){
-  const needs=(typeof cStudies!=='undefined')&&cStudies.some(s=>/Sí|yodado|gadolinio|bario/i.test(s.contrast||''))||
-              (typeof cStudies!=='undefined')&&cStudies.some(s=>/tomograf|\btc\b|angiotc|urotc/i.test((s.modality||'')+(s.name||'')));
+  const needs=(typeof cStudies!=='undefined')&&cStudies.some(s=>/Sí|yodado|gadolinio|bario/i.test(s.contrast||'')||/tomograf|\btc\b|angiotc|urotc|panscan/i.test((s.modality||'')+(s.name||'')));
   show('secContraste',!!needs);
+  const add=document.getElementById('cContrastAdd');
+  const on=!!(add&&add.checked);
+  const card=document.getElementById('secContraste');
+  if(card)card.classList.toggle('ct-pending',!on);   // amarillo cuando NO marcado
+  show('ctFields',on);
+  if(!on)return;
   const cd=getContrastData();
   show('ctOral',cd.tipo==='Oral'||cd.tipo==='Ambos');
   show('ctEv',cd.tipo==='Endovenoso'||cd.tipo==='Ambos');
   show('ctOralFin',cd.terminoOral);
   show('ctOralRetiro',v('cOralEstado')==='No terminó');
-  // auto scan time = inicio + 60min (editable)
   if((cd.tipo==='Oral'||cd.tipo==='Ambos')&&cd.oralInicio&&!v('cScanHora')){const ts=hhmmToTs(cd.oralInicio,60);if(ts){const d=new Date(ts);sv('cScanHora',String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'));}}
-  // protocolos en dropdown
   const sel=document.getElementById('cEvProtocolo');
   if(sel&&sel.options.length<=1){sel.innerHTML='<option value="">— Protocolo —</option>'+(D.protocols||[]).map(p=>`<option>${esc(p.name)}</option>`).join('');}
-  // fases del protocolo elegido
   const ph=document.getElementById('ctEvPhases');
   if(ph){const proto=(D.protocols||[]).find(p=>p.name===cd.evProtocolo);ph.innerHTML=proto?('<div class="phase-box">'+proto.phases.map(x=>`<span class="phase-chip">${esc(x)}</span>`).join('')+(proto.note?`<div class="phase-note">📌 ${esc(proto.note)}</div>`:'')+'</div>'):'';}
 }
@@ -1506,12 +1526,18 @@ function buildCaseRecord(withData){
   const first=(typeof cStudies!=='undefined'&&cStudies[0])||null;
   const cd=getContrastData();
   return{serv:c.serv,doc:c.doc,ext:c.ext,name:withData?c.px:'',ced:withData?c.ced:'',
-    edad:c.edad,sexo:c.sexo,ub:c.ub,app:c.app,apqx:c.apqx,alergia:c.alergia,traslado:c.traslado,
+    edad:c.edad,sexo:c.sexo,ub:c.ub,app:c.app,apqx:c.apqx,alergia:c.alergia,traslado:c.traslado,movilidad:c.traslado||'',
     hist:c.hist,exam:c.exam,desc:c.desc,studies,labs:labsLine(),pending:pendingLines(),status:statusLabel(),
     icon:modIconFor(studies.join(' ')+' '+(first?first.modality:'')),
     studyShort:first?studyShortCode(first):studies.join(', '),
     indShort:c.desc||'',comentario:caseContrastComment(),
-    contrast:Object.assign({},cd,{alerts:contrastAlerts(cd)}),withData:!!withData};
+    contrast:Object.assign({},cd,{alerts:cd.add?contrastAlerts(cd):[]}),withData:!!withData};
+}
+function upsertQuick(id,rec){
+  if(!D.quickStack)D.quickStack=[];
+  const blk=patientBlock(rec);
+  const e=D.quickStack.find(x=>x.id===id);
+  if(e)e.block=blk;else D.quickStack.push({id,block:blk});
 }
 function autoSaveCase(trigger,withData){
   if(!caseHasContent())return;
@@ -1519,11 +1545,13 @@ function autoSaveCase(trigger,withData){
   const rec=buildCaseRecord(withData);
   if(currentCaseId){
     const ex=D.registry.find(r=>r.id===currentCaseId);
-    if(ex){Object.assign(ex,rec,{estado:ex.estado||'activo',bloque:ex.bloque||caseBloque()});save();renderBandeja();return;}
+    if(ex){Object.assign(ex,rec,{estado:ex.estado||'activo',bloque:ex.bloque||caseBloque()});upsertQuick(currentCaseId,ex);save();renderBandeja();return;}
   }
   const id='px_'+Date.now()+'_'+Math.random().toString(36).slice(2,6);
   currentCaseId=id;
-  D.registry.unshift(Object.assign({id,ts:Date.now(),date:fmtDate(new Date()),month:new Date().toISOString().slice(0,7),bloque:caseBloque(),estado:'activo'},rec));
+  const full=Object.assign({id,ts:Date.now(),date:fmtDate(new Date()),month:new Date().toISOString().slice(0,7),bloque:caseBloque(),estado:'activo'},rec);
+  D.registry.unshift(full);
+  upsertQuick(id,full);
   if(D.registry.length>500)D.registry=D.registry.slice(0,500);
   save();renderBandeja();
 }
@@ -1615,21 +1643,47 @@ function renderCodedBar(){
     <div class="br"><button class="btn" onclick="genCoded()">📝 Generar resumen</button><button class="btn gh" onclick="clearBandSel()">Limpiar selección</button></div>`;
 }
 function clearBandSel(){bandSel.clear();renderBandeja();}
-function recLine(r){
-  const head=`${r.icon||'🩻'}${r.ext||''} ${r.serv||''}${r.doc?' | '+r.doc:''}`.trim();
-  const idline=`${r.ced||''}  ${r.edad?r.edad+'a':''}`.trim();
-  const study=`${r.studyShort||(r.studies||[]).join(', ')}${r.indShort?' x '+r.indShort:''}`;
-  let l=[head,r.name||'—'];if(idline)l.push(idline);l.push(study);if(r.comentario)l.push('* '+r.comentario);
-  return l.join('\n');
+/* Bloque de paciente — formato real del resumen de guardia */
+function patientBlock(d){
+  const icon=d.icon||'☢️';
+  const head=`${icon}${d.ext||''}${(d.doc||d.serv)?' '+(d.doc||d.serv):''}`.trim();
+  const l2=`${d.name||'—'}${d.edad?' '+d.edad+'a':''}`.trim();
+  const l3=(d.ced||'').trim();
+  const study=d.studyShort||((d.studies||[]).join(', '));
+  const l4=`${study||''}${d.indShort?' ad '+d.indShort:''}`.trim();
+  const lines=[head,l2];
+  if(l3)lines.push(l3);
+  if(l4)lines.push(l4);
+  if(d.movilidad)lines.push(d.movilidad);
+  if(d.comentario)String(d.comentario).split('\n').forEach(c=>{c=c.trim();if(c)lines.push(c[0]==='-'?c:'- '+c);});
+  return lines.join('\n');
 }
+function recLine(r){return patientBlock(r);}
+/* Bloque del caso que se está escribiendo ahora (preview en vivo) */
+function currentBlockFromCase(){
+  const c=(typeof C==='function')?C():{};
+  const studies=(typeof cStudies!=='undefined'?cStudies:[]).map(s=>s.name);
+  const first=(typeof cStudies!=='undefined'&&cStudies[0])||null;
+  return patientBlock({icon:modIconFor(studies.join(' ')+' '+(first?first.modality:'')),ext:c.ext,doc:c.doc,serv:c.serv,name:c.px,edad:c.edad,ced:c.ced,studyShort:first?studyShortCode(first):studies.join(', '),indShort:c.desc,movilidad:c.traslado,comentario:caseContrastComment()});
+}
+/* Resumen rápido de pacientes — apila hasta copiar o vaciar, separado por barras */
+function buildQuickStack(){
+  const SEP='\n|—————————|\n';
+  const live=caseHasContent()?currentBlockFromCase():null;
+  const blocks=(D.quickStack||[]).map(e=>(e.id===currentCaseId&&live)?live:e.block);
+  if(live&&(!currentCaseId||!(D.quickStack||[]).some(e=>e.id===currentCaseId)))blocks.push(live);
+  if(!blocks.length)return '';
+  return '*RESUMEN*\n'+blocks.join(SEP);
+}
+function clearQuickStack(){D.quickStack=[];save();if(typeof buildCase==='function')buildCase();toast('Resumen vaciado');}
 function genCoded(){
   const recs=(D.registry||[]).filter(r=>bandSel.has(r.id));
   if(!recs.length){toast('Seleccioná al menos un paciente');return;}
   const principal=recs.filter(r=>r.estado!=='comentario');
   const coment=recs.filter(r=>r.estado==='comentario');
   let out='*RESUMEN*\n';
-  out+=principal.map(recLine).join('\n');
-  if(coment.length){out+='\n————- COMENTARIO ————-\n'+coment.map(recLine).join('\n');}
+  out+=principal.map(patientBlock).join('\n');
+  if(coment.length){out+='\n————- COMENTARIO ————-\n'+coment.map(patientBlock).join('\n');}
   sv('codedOut',out.trim());
   document.getElementById('codedOutWrap').classList.remove('hidden');
   document.getElementById('codedOutWrap').scrollIntoView({behavior:'smooth',block:'center'});
@@ -1641,6 +1695,7 @@ function initRegistry(){
   if(!D.protocols||!D.protocols.length)D.protocols=JSON.parse(JSON.stringify(SEED_PROTOCOLS));
   if(!D.modcodes||!D.modcodes.length)D.modcodes=JSON.parse(JSON.stringify(SEED_MODCODES));
   if(!D.phrases)D.phrases=['* más tarde','* que coordinen mañana','* se le puso nota','* pendiente creatinina','* pendiente canalización','* paciente no preparado','* no localizado','* llamar al servicio'];
+  if(!D.quickStack)D.quickStack=[];
   // migración historial viejo → registro
   if((!D.registry.length)&&D.history&&D.history.length){
     D.registry=D.history.map(h=>({id:'px_'+(h.ts||Date.now())+'_'+Math.random().toString(36).slice(2,6),ts:h.ts||Date.now(),date:h.date,month:new Date(h.ts||Date.now()).toISOString().slice(0,7),bloque:'',estado:'cerrado',serv:h.serv,doc:h.doc||'',ext:h.ext||'',name:h.px?h.px.n:'',ced:h.px?h.px.ced:'',edad:h.px?h.px.edad:'',sexo:h.px?h.px.sexo:'',ub:h.px?h.px.ub:'',desc:h.desc,studies:h.studies||[],labs:h.labs||'',pending:h.pending||[],status:h.status||'',icon:modIconFor((h.studies||[]).join(' ')),studyShort:(h.studies||[]).join(', '),indShort:h.desc||'',comentario:'',contrast:{},withData:!!h.px}));
@@ -1669,9 +1724,9 @@ function requestNotif(){try{if('Notification'in window&&Notification.permission=
 /* ---------- CONFIG: PROTOCOLOS ---------- */
 function renderProtocols(){
   const box=document.getElementById('protoList');if(!box)return;
-  box.innerHTML=(D.protocols||[]).map((p,i)=>`<div class="item"><div><b>${esc(p.name)}</b><span>${esc(p.ind||'')}<br>${(p.phases||[]).map(esc).join(' · ')}${p.note?'<br>📌 '+esc(p.note):''}</span></div><div class="acts"><button class="ib d" onclick="delProto(${i})">X</button></div></div>`).join('')||'<p class="muted">Sin protocolos.</p>';
+  box.innerHTML=(D.protocols||[]).map((p,i)=>`<div class="item"><div><b>${esc(p.name)}</b><span>${esc(p.ind||'')}<br>${(p.phases||[]).map(esc).join(' · ')}${p.note?'<br>📌 '+esc(p.note):''}${p.ctx?'<br><i style="opacity:.85">'+esc(p.ctx)+'</i>':''}</span></div><div class="acts"><button class="ib d" onclick="delProto(${i})">X</button></div></div>`).join('')||'<p class="muted">Sin protocolos.</p>';
 }
-function addProto(){const name=v('protoName');if(!name){toast('Falta nombre');return;}const phases=v('protoPhases').split('\n').map(s=>s.trim()).filter(Boolean);D.protocols.push({name,ind:v('protoInd'),phases,note:v('protoNote')});['protoName','protoInd','protoPhases','protoNote'].forEach(id=>sv(id,''));save();renderProtocols();toast('Protocolo agregado');}
+function addProto(){const name=v('protoName');if(!name){toast('Falta nombre');return;}const phases=v('protoPhases').split('\n').map(s=>s.trim()).filter(Boolean);D.protocols.push({name,ind:v('protoInd'),phases,note:v('protoNote'),ctx:v('protoCtx')});['protoName','protoInd','protoPhases','protoNote','protoCtx'].forEach(id=>sv(id,''));save();renderProtocols();toast('Protocolo agregado');}
 function delProto(i){D.protocols.splice(i,1);save();renderProtocols();toast('Eliminado');}
 function renderModcodes(){const box=document.getElementById('modcodeList');if(!box)return;box.innerHTML=(modCodes()).map((m,i)=>`<div class="item"><div><b>${m.icon} ${esc(m.label)}</b><span>${esc(m.terms)}</span></div></div>`).join('');}
 function renderPhrasesCfg(){const box=document.getElementById('phraseList');if(!box)return;box.innerHTML=(quickPhrases()).map((p,i)=>`<div class="item"><div><b>${esc(p)}</b></div><div class="acts"><button class="ib d" onclick="delPhrase(${i})">X</button></div></div>`).join('');}
@@ -1737,7 +1792,7 @@ const DIV='━━━━━━━━━━━━━━━';
 function baseData(){return{
   theme:'clinico',
   services:[{n:'Urgencias',t:'Urgencias'},{n:'Medicina Interna',t:'Hospitalización'},{n:'Cirugía',t:'Quirúrgico'},{n:'Pediatría',t:'Hospitalización'},{n:'UCI',t:'UCI'},{n:'Urología',t:'Hospitalización'},{n:'Ortopedia / Trauma',t:'Quirúrgico'},{n:'Neurología / Neurocirugía',t:'Hospitalización'},{n:'Ginecología / Obstetricia',t:'Hospitalización'},{n:'Gastroenterología',t:'Hospitalización'},{n:'Oncología',t:'Hospitalización'},{n:'Cardiología',t:'Hospitalización'},{n:'Nefrología',t:'Hospitalización'},{n:'Consulta externa',t:'Ambulatorio'}],
-  studies:clone(SEED_STUDIES),modalities:clone(SEED_MODALITIES),history:[],shiftDays:{},summaries:[],registry:[],protocols:[],modcodes:[],phrases:[]}}
+  studies:clone(SEED_STUDIES),modalities:clone(SEED_MODALITIES),history:[],shiftDays:{},summaries:[],registry:[],protocols:[],modcodes:[],phrases:[],quickStack:[]}}
 function clone(o){return JSON.parse(JSON.stringify(o))}
 function load(){try{const s=JSON.parse(localStorage.getItem(KEY)||'null');if(s)return Object.assign(clone(baseData()),s);}catch(e){}return clone(baseData());}
 let D=load(),cStudies=[],labState={},voiceParsed={},stLabReqs=[];
@@ -1755,7 +1810,7 @@ function dateKey(y,m,d){return`${y}-${String(m+1).padStart(2,'0')}-${String(d).p
 function labById(id){return LABS.find(l=>l.id===id);}
 
 /* COPIADO */
-async function copyOut(id){const el=document.getElementById(id);if(!el||!el.value.trim()){toast('Nada que copiar');return;}if(id==='caseOut'&&typeof autoSaveCase==='function')autoSaveCase('copy');const txt=el.value;if(navigator.clipboard&&window.isSecureContext){try{await navigator.clipboard.writeText(txt);toast('✅ Copiado');return;}catch(e){}}try{el.removeAttribute('readonly');el.focus();el.select();el.setSelectionRange(0,txt.length);const ok=document.execCommand('copy');el.setAttribute('readonly','');if(ok){toast('✅ Copiado');return;}}catch(e){}selOut(id);toast('Seleccionado — mantené presionado y "Copiar"');}
+async function copyOut(id){const el=document.getElementById(id);if(!el||!el.value.trim()){toast('Nada que copiar');return;}if(id==='caseOut'&&typeof autoSaveCase==='function')autoSaveCase('copy');const txt=el.value;const isQuick=(id==='caseOut'&&document.querySelector('.ttab.active')?.dataset.tpl==='quick');const done=()=>{if(isQuick&&typeof D!=='undefined'){D.quickStack=[];save();}};if(navigator.clipboard&&window.isSecureContext){try{await navigator.clipboard.writeText(txt);toast('✅ Copiado');done();return;}catch(e){}}try{el.removeAttribute('readonly');el.focus();el.select();el.setSelectionRange(0,txt.length);const ok=document.execCommand('copy');el.setAttribute('readonly','');if(ok){toast('✅ Copiado');done();return;}}catch(e){}selOut(id);toast('Seleccionado — mantené presionado y "Copiar"');}
 function selOut(id){const el=document.getElementById(id);if(!el)return;el.removeAttribute('readonly');el.focus();el.select();el.setSelectionRange(0,(el.value||'').length);el.setAttribute('readonly','');}
 function openWA(id){const el=document.getElementById(id);if(!el||!el.value.trim()){toast('Generá el mensaje primero');return;}
   if(typeof stopDictation==='function'){try{stopDictation();}catch(e){}}
@@ -1763,7 +1818,8 @@ function openWA(id){const el=document.getElementById(id);if(!el||!el.value.trim(
   try{drop&&drop.classList&&drop.classList.remove('open');}catch(e){}
   try{localStorage.setItem('rg_lastview',document.querySelector('.view.active')?.id||'vCaso');}catch(e){}
   const url='https://wa.me/?text='+encodeURIComponent(el.value);
-  const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';document.body.appendChild(a);a.click();setTimeout(()=>{try{document.body.removeChild(a);}catch(e){}},300);}
+  const a=document.createElement('a');a.href=url;a.target='_blank';a.rel='noopener noreferrer';document.body.appendChild(a);a.click();setTimeout(()=>{try{document.body.removeChild(a);}catch(e){}},300);
+  if(id==='caseOut'&&document.querySelector('.ttab.active')?.dataset.tpl==='quick'&&typeof D!=='undefined'){D.quickStack=[];save();}}
 /* Restaurar estado al volver de WhatsApp (evita que se cuelgue en iOS) */
 function restoreOnReturn(){try{const lv=localStorage.getItem('rg_lastview');if(lv&&document.getElementById(lv)&&!document.getElementById(lv).classList.contains('active')){const idx=VIEWS.indexOf(lv);if(idx>=0)goV(lv,idx);}}catch(e){}}
 window.addEventListener('pageshow',e=>{if(e.persisted)restoreOnReturn();});
@@ -1774,7 +1830,7 @@ const VIEWS=['vCaso','vVoz','vResumenes','vTurnos','vConfig','vManual'];
 function goV(vid,idx){VIEWS.forEach(id=>document.getElementById(id).classList.remove('active'));document.getElementById(vid).classList.add('active');document.querySelectorAll('.bnav button').forEach((b,i)=>b.classList.toggle('active',i===idx));window.scrollTo({top:0,behavior:'smooth'});if(vid==='vTurnos')renderCal();if(vid==='vResumenes'&&typeof renderBandeja==='function'){renderBandeja();if(typeof renderSummaryPicker==='function')renderSummaryPicker();}}
 function goMod(m){document.querySelectorAll('.mod').forEach(x=>x.classList.remove('active'));document.getElementById(m).classList.add('active');document.querySelectorAll('.cnav button').forEach(b=>b.classList.toggle('active',b.dataset.mod===m));}
 document.querySelectorAll('.cnav button').forEach(b=>b.onclick=()=>goMod(b.dataset.mod));
-document.querySelectorAll('.ttab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ttab').forEach(x=>x.classList.remove('active'));b.classList.add('active');buildCase();});
+document.querySelectorAll('.ttab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ttab').forEach(x=>x.classList.remove('active'));b.classList.add('active');const q=b.dataset.tpl==='quick';const qh=document.getElementById('quickHint'),bv=document.getElementById('btnVaciarQuick');if(qh)qh.style.display=q?'block':'none';if(bv)bv.style.display=q?'block':'none';buildCase();});
 document.querySelectorAll('.vm').forEach(b=>b.onclick=()=>{document.querySelectorAll('.vm').forEach(x=>x.classList.remove('active'));b.classList.add('active');show('vmRecBar',b.dataset.m==='dict');});
 
 /* TEMAS */
@@ -1882,26 +1938,16 @@ function pendingLines(){return validate().filter(a=>a.l!=='green').map(a=>({red:
 /* GENERADOR — Formato Karol */
 function fmtMsg(c,studies,labs,pend,st){
   const estudios=studies.length?studies.map(s=>`  • ${s}`).join('\n'):'  (sin estudios)';
-  return `SOLICITUD RADIOLÓGICA\n${DIV}\n📞 EXT: ${c.ext||'—'}\n👨‍⚕️ Médico: ${c.doc||'—'}\n🏥 Servicio: ${c.serv||'—'}\n${DIV}\n👤 Paciente: ${c.px||'—'}\n🆔 Cédula: ${c.ced||'—'}\n🎂 Edad: ${c.edad||'—'}${c.sexo?' · '+c.sexo:''}\n📜 APP: ${c.app||'—'}\n🔪 APQX: ${c.apqx||'—'}${c.alergia?'\n⚠️ Alergia: '+c.alergia:'\nAlergia: —'}\n📍 Ubicación: ${c.ub||'—'}\n🚶 Traslado: ${c.traslado||'—'}\n${DIV}\n📋 Historia: ${c.hist||'—'}\n🔬 Examen: ${c.exam||'—'}\n🧪 Labs: ${labs}\n${DIV}\n🎯 Estudio${studies.length>1?'s':''}:\n${estudios}\n❓ Descartar: ${c.desc||'—'}${c.canaliz?'\n💉 Canalización: '+c.canaliz:''}${c.consent&&c.consent!=='No aplica'?'\n🖊️ Consentimiento: '+c.consent:''}${c.imgPrev?'\n🖼️ Imagen previa: '+c.imgPrev:''}${c.otros?'\n👥 Otros servicios: '+c.otros:''}\n${DIV}\nESTADO: ${st}\n${pend.length?'PENDIENTES:\n'+pend.join('\n'):'✅ Sin pendientes'}`;
+  const ct=(typeof caseContrastComment==='function')?caseContrastComment():'';
+  return `SOLICITUD RADIOLÓGICA\n${DIV}\n📞 EXT: ${c.ext||'—'}\n👨‍⚕️ Médico: ${c.doc||'—'}\n🏥 Servicio: ${c.serv||'—'}\n${DIV}\n👤 Paciente: ${c.px||'—'}\n🆔 Cédula: ${c.ced||'—'}\n🎂 Edad: ${c.edad||'—'}${c.sexo?' · '+c.sexo:''}\n📜 APP: ${c.app||'—'}\n🔪 APQX: ${c.apqx||'—'}${c.alergia?'\n⚠️ Alergia: '+c.alergia:'\nAlergia: —'}\n📍 Ubicación: ${c.ub||'—'}\n🚶 Traslado: ${c.traslado||'—'}\n${DIV}\n📋 Historia: ${c.hist||'—'}\n🔬 Examen: ${c.exam||'—'}\n🧪 Labs: ${labs}\n${DIV}\n🎯 Estudio${studies.length>1?'s':''}:\n${estudios}\n❓ Descartar: ${c.desc||'—'}${c.canaliz?'\n💉 Canalización: '+c.canaliz:''}${ct?'\n🕐 Contraste: '+ct:''}${c.consent&&c.consent!=='No aplica'?'\n🖊️ Consentimiento: '+c.consent:''}${c.imgPrev?'\n🖼️ Imagen previa: '+c.imgPrev:''}${c.otros?'\n👥 Otros servicios: '+c.otros:''}\n${DIV}\nESTADO: ${st}\n${pend.length?'PENDIENTES:\n'+pend.join('\n'):'✅ Sin pendientes'}`;
 }
 function buildCase(){
   const c=C(),tpl=document.querySelector('.ttab.active')?.dataset.tpl||'service';
   const studies=cStudies.map(s=>s.name),pend=pendingLines(),st=statusLabel(),labs=labsLine();
   let out='';
   if(tpl==='service')out=fmtMsg(c,studies,labs,pend,st);
-  else out=quickLine(c,studies,labs);
+  else out=(typeof buildQuickStack==='function')?buildQuickStack():'';
   sv('caseOut',out);return out;
-}
-/* Resumen rápido del paciente actual (formato codificado de guardia) */
-function quickLine(c,studies,labs){
-  const first=(cStudies&&cStudies[0])||null;
-  const icon=(typeof modIconFor==='function')?modIconFor(studies.join(' ')+' '+(first?first.modality:'')):'🩻';
-  const studyShort=(first&&typeof studyShortCode==='function')?studyShortCode(first):studies.join(', ');
-  const com=(typeof caseContrastComment==='function')?caseContrastComment():'';
-  const head=`${icon}${c.ext||''} ${c.serv||''}${c.doc?' | '+c.doc:''}`.trim();
-  const idline=`${c.ced||''}  ${c.edad?c.edad+'a':''}`.trim();
-  let l=[head,c.px||'—'];if(idline)l.push(idline);l.push(`${studyShort||'—'}${c.desc?' x '+c.desc:''}`);if(com)l.push('* '+com);
-  return l.join('\n');
 }
 
 /* HISTORIAL */
@@ -1909,7 +1955,7 @@ function savePx(withData){if(!cStudies.length&&!v('cPaciente')){toast('Agregá a
 function renderHistory(){const box=document.getElementById('histList');const R=D.registry||[];if(!R.length){box.innerHTML='<p class="muted">Sin pacientes en el registro.</p>';return;}box.innerHTML=R.map(h=>{const who=h.name?`${esc(h.name)} · ${esc(h.edad||'')} · ${esc(h.ub||'')}`:'<i>Sin datos personales</i>';return`<div class="item"><div><b>${h.icon||''} ${esc(h.date)} · ${esc(h.estado||'')}</b><span>${who}<br>${esc(h.serv||'')} · ${esc(h.studyShort||(h.studies||[]).join(', '))}<br>${h.indShort?'x '+esc(h.indShort):''}${h.comentario?' · '+esc(h.comentario):''}</span></div><div class="acts"><button class="ib d" onclick="delHistory('${h.id}')">X</button></div></div>`;}).join('');}
 function delHistory(id){D.registry=(D.registry||[]).filter(r=>r.id!==id);if(typeof currentCaseId!=='undefined'&&currentCaseId===id)currentCaseId=null;save();renderHistory();if(typeof renderBandeja==='function')renderBandeja();toast('Eliminado');}
 function clearHistory(){if(confirm('¿Borrar todo el registro de pacientes?')){D.registry=[];if(typeof bandSel!=='undefined')bandSel.clear();save();renderHistory();if(typeof renderBandeja==='function')renderBandeja();}}
-function clearCase(){if(caseHasContent&&caseHasContent()&&typeof autoSaveCase==='function')autoSaveCase('clear');currentCaseId=null;cStudies=[];labState={};['cMedico','cExt','cPaciente','cCedula','cEdad','cUbicacion','cApp','cApqx','cAlergia','cHistoria','cExamen','cDescartar','cCanaliz','cCoag','cOtros','cOralInicio','cOralFin','cOralRetiro','cScanHora','cEvHora'].forEach(id=>sv(id,''));['cSexo','cServicio','cTraslado','cRmSafety','cEmbarazo','cPrep','cConsent','cImagenPrevia','cContrastTipo','cOralEstado','cEvProtocolo'].forEach(id=>sv(id,''));sv('caseOut','');renderChips();initLabs();renderLabActive();updateSec();if(typeof updateContrastSection==='function')updateContrastSection();validate();buildCase();toast('Caso guardado y limpiado');}
+function clearCase(){if(caseHasContent&&caseHasContent()&&typeof autoSaveCase==='function')autoSaveCase('clear');currentCaseId=null;cStudies=[];labState={};['cMedico','cExt','cPaciente','cCedula','cEdad','cUbicacion','cApp','cApqx','cAlergia','cHistoria','cExamen','cDescartar','cCanaliz','cCoag','cOtros','cOralInicio','cOralFin','cOralRetiro','cScanHora','cEvHora'].forEach(id=>sv(id,''));['cSexo','cServicio','cTraslado','cRmSafety','cEmbarazo','cPrep','cConsent','cImagenPrevia','cContrastTipo','cOralEstado','cEvProtocolo'].forEach(id=>sv(id,''));const cb=document.getElementById('cContrastAdd');if(cb)cb.checked=false;sv('caseOut','');renderChips();initLabs();renderLabActive();updateSec();if(typeof updateContrastSection==='function')updateContrastSection();validate();buildCase();toast('Caso guardado y limpiado');}
 
 /* VOZ */
 function norm(t){return t.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').trim();}
@@ -1953,18 +1999,17 @@ function prevMonth(){calM--;if(calM<0){calM=11;calY--;}selDay=null;closeDay();re
 function nextMonth(){calM++;if(calM>11){calM=0;calY++;}selDay=null;closeDay();renderCal();}
 function isHoliday(y,m,d){return(PANAMA_HOLIDAYS[y]||[]).includes(dateKey(y,m,d));}
 function dayKind(ov){return (ov&&ov.kind)||(ov&&ov.turno===true?'turno':null);}
-function getDayInfo(y,m,d){const key=dateKey(y,m,d),ov=D.shiftDays[key]||{};const dt=new Date(y,m,d),dow=dt.getDay();const wk=(dow===0||dow===6),hol=isHoliday(y,m,d);const kind=dayKind(ov);const turno=kind==='turno',libre=kind==='libre',vac=kind==='vacaciones';const prevKind=dayKind(D.shiftDays[dateKey(y,m,d-1)]||{});const post=prevKind==='turno'&&!libre&&!vac;const is24=wk||hol;const plantActive=(!wk&&!hol&&!libre&&!vac);return{key,wk,hol,kind,turno,libre,vac,post,is24,hours:turno?(is24?24:16):0,plantActive,pay:ov.pay||'N',notes:ov.notes||''};}
+function getDayInfo(y,m,d){const key=dateKey(y,m,d),ov=D.shiftDays[key]||{};const dt=new Date(y,m,d),dow=dt.getDay();const wk=(dow===0||dow===6),hol=isHoliday(y,m,d);const kind=dayKind(ov);const turno=kind==='turno',libre=kind==='libre',vac=kind==='vacaciones';const prevKind=dayKind(D.shiftDays[dateKey(y,m,d-1)]||{});const post=prevKind==='turno'&&!libre&&!vac;const is24=wk||hol;const plantActive=(!wk&&!hol&&!libre&&!vac);return{key,wk,hol,kind,turno,libre,vac,post,is24,hours:turno?(is24?24:16):0,plantActive,notes:ov.notes||''};}
 function renderCal(){
   const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   document.getElementById('calTitle').textContent=`${months[calM]} ${calY}`;
   const dim=new Date(calY,calM+1,0).getDate(),firstDow=new Date(calY,calM,1).getDay();
-  let tur=0,pag=0,fat=0,hrs=0;
+  let tur=0,fat=0,hrs=0;
   let html=['DOM','LUN','MAR','MIÉ','JUE','VIE','SÁB'].map(d=>`<div class="dow">${d}</div>`).join('');
   for(let i=0;i<firstDow;i++)html+='<div class="day empty"></div>';
-  for(let d=1;d<=dim;d++){const info=getDayInfo(calY,calM,d);const combo=info.plantActive&&info.turno,fat_=combo||info.post;if(info.turno){tur++;if(info.pay==='P')pag++;hrs+=info.hours;}if(fat_)fat++;html+=`<div class="day${info.wk?' weekend':''}${info.hol?' holiday':''}${info.turno?' hasturno':''}${info.libre?' haslibre':''}${info.vac?' hasvac':''}${selDay===d?' selected':''}" onclick="selectDay(${d})"><div class="num">${d}</div><div class="dtags">${info.hol?'<span class="dtag hol">Fer</span>':''}${info.plantActive?'<span class="dtag pl">P</span>':''}${info.turno?'<span class="dtag t">T</span>':''}${info.libre?'<span class="dtag l">L</span>':''}${info.vac?'<span class="dtag v">V</span>':''}${info.post?'<span class="dtag post">Post</span>':''}${fat_?'<span class="dtag fat">⚡</span>':''}${info.turno?`<span class="dtag ${info.pay==='P'?'paid':'pend'}">${info.pay==='P'?'✓':'⏳'}</span>`:''}</div></div>`;}
+  for(let d=1;d<=dim;d++){const info=getDayInfo(calY,calM,d);const combo=info.plantActive&&info.turno,fat_=combo||info.post;if(info.turno){tur++;hrs+=info.hours;}if(fat_)fat++;html+=`<div class="day${info.wk?' weekend':''}${info.hol?' holiday':''}${info.turno?' hasturno':''}${info.libre?' haslibre':''}${info.vac?' hasvac':''}${selDay===d?' selected':''}" onclick="selectDay(${d})"><div class="num">${d}</div><div class="dtags">${info.hol?'<span class="dtag hol">Fer</span>':''}${info.plantActive?'<span class="dtag pl">P</span>':''}${info.turno?'<span class="dtag t">T</span>':''}${info.libre?'<span class="dtag l">L</span>':''}${info.vac?'<span class="dtag v">V</span>':''}${info.post?'<span class="dtag post">Post</span>':''}${fat_?'<span class="dtag fat">⚡</span>':''}</div></div>`;}
   document.getElementById('calGrid').innerHTML=html;
   document.getElementById('kTurnos').textContent=tur;
-  document.getElementById('kPagados').textContent=pag;
   document.getElementById('kFatiga').textContent=fat;
   document.getElementById('kHoras').textContent=Math.round(hrs)+'h';
   document.getElementById('kShifts').textContent=tur;
@@ -1974,7 +2019,7 @@ function renderShiftSummary(){
   const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];
   const dim=new Date(calY,calM+1,0).getDate();const dows=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
   let turnos=[],hols=[],libres=[],vacs=[];
-  for(let d=1;d<=dim;d++){const info=getDayInfo(calY,calM,d);const dow=dows[new Date(calY,calM,d).getDay()];if(info.turno)turnos.push(`${dow} ${d} · ${info.is24?'24h':'16h'} ${info.pay==='P'?'✓':'⏳'}${info.notes?' — '+info.notes:''}`);if(info.libre)libres.push(`${dow} ${d}`);if(info.vac)vacs.push(`${dow} ${d}`);if(info.hol)hols.push(`${dow} ${d}`);}
+  for(let d=1;d<=dim;d++){const info=getDayInfo(calY,calM,d);const dow=dows[new Date(calY,calM,d).getDay()];if(info.turno)turnos.push(`${dow} ${d} · ${info.is24?'24h':'16h'}${info.notes?' — '+info.notes:''}`);if(info.libre)libres.push(`${dow} ${d}`);if(info.vac)vacs.push(`${dow} ${d}`);if(info.hol)hols.push(`${dow} ${d}`);}
   let h=`<div class="card-title" style="font-size:.95rem">📋 Resumen de ${months[calM]} ${calY}</div>`;
   if(!turnos.length&&!hols.length&&!libres.length&&!vacs.length)h+='<p class="muted">Sin eventos este mes. Tocá un día para elegir su estado.</p>';
   if(turnos.length){h+=`<div style="margin-top:6px"><div class="ss-row"><span class="ss-badge t">TURNOS</span><b>${turnos.length} día(s)</b></div>`;turnos.forEach(t=>h+=`<div class="ss-row"><span class="ss-badge t">T</span><span>${esc(t)}</span></div>`);h+='</div>';}
@@ -1984,14 +2029,14 @@ function renderShiftSummary(){
   document.getElementById('shiftSummary').innerHTML=h;
 }
 function selectDay(d){selDay=(selDay===d?null:d);renderCal();const box=document.getElementById('dayEdit');if(!selDay){box.classList.add('hidden');return;}box.classList.remove('hidden');const info=getDayInfo(calY,calM,d);const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];document.getElementById('dayEditTitle').textContent=`${d} de ${months[calM]} ${calY}${info.hol?' 🎉 Feriado':''}${info.wk?' · fin de semana':''}`;syncDayUI(info);}
-function syncDayUI(info){const t=document.getElementById('sbTurno'),l=document.getElementById('sbLibre'),vc=document.getElementById('sbVac');if(t)t.className='state-btn st-t'+(info.turno?' active':'');if(l)l.className='state-btn st-l'+(info.libre?' active':'');if(vc)vc.className='state-btn st-v'+(info.vac?' active':'');show('turnoExtra',info.turno);if(info.turno){sv('dPago',info.pay);sv('dDur',info.is24?'24h (07–07)':'16h (15–07)');}sv('dNotas',info.notes);}
-function setDayKind(kind){if(!selDay)return;const key=dateKey(calY,calM,selDay);const ov=D.shiftDays[key]||{};const cur=dayKind(ov);if(cur===kind){delete D.shiftDays[key];}else{const n={kind};if(kind==='turno')n.pay=ov.pay||'N';if(ov.notes)n.notes=ov.notes;D.shiftDays[key]=n;}save();renderCal();const info=getDayInfo(calY,calM,selDay);syncDayUI(info);toast(cur===kind?'Día limpiado':({turno:'Turno marcado',libre:'Día libre marcado',vacaciones:'Vacación marcada'}[kind]));}
-function saveDayQuick(){if(!selDay)return;const key=dateKey(calY,calM,selDay);const ov=D.shiftDays[key];if(!ov)return;if(ov.kind==='turno')ov.pay=v('dPago')||'N';const notes=v('dNotas');if(notes)ov.notes=notes;else delete ov.notes;D.shiftDays[key]=ov;save();renderCal();}
+function syncDayUI(info){const t=document.getElementById('sbTurno'),l=document.getElementById('sbLibre'),vc=document.getElementById('sbVac');if(t)t.className='state-btn st-t'+(info.turno?' active':'');if(l)l.className='state-btn st-l'+(info.libre?' active':'');if(vc)vc.className='state-btn st-v'+(info.vac?' active':'');show('turnoExtra',info.turno);if(info.turno){sv('dDur',info.is24?'24h (07–07)':'16h (15–07)');}sv('dNotas',info.notes);}
+function setDayKind(kind){if(!selDay)return;const key=dateKey(calY,calM,selDay);const ov=D.shiftDays[key]||{};const cur=dayKind(ov);if(cur===kind){delete D.shiftDays[key];}else{const n={kind};if(ov.notes)n.notes=ov.notes;D.shiftDays[key]=n;}save();renderCal();const info=getDayInfo(calY,calM,selDay);syncDayUI(info);toast(cur===kind?'Día limpiado':({turno:'Turno marcado',libre:'Día libre marcado',vacaciones:'Vacación marcada'}[kind]));}
+function saveDayQuick(){if(!selDay)return;const key=dateKey(calY,calM,selDay);const ov=D.shiftDays[key];if(!ov)return;const notes=v('dNotas');if(notes)ov.notes=notes;else delete ov.notes;D.shiftDays[key]=ov;save();renderCal();}
 function closeDay(){selDay=null;const b=document.getElementById('dayEdit');if(b)b.classList.add('hidden');}
 function rangeKeys(){const from=v('vacFrom'),to=v('vacTo');if(!from||!to)return null;let d0=new Date(from+'T00:00:00'),d1=new Date(to+'T00:00:00');if(isNaN(d0)||isNaN(d1))return null;if(d1<d0){const t=d0;d0=d1;d1=t;}const keys=[];let cur=new Date(d0);while(cur<=d1){keys.push(dateKey(cur.getFullYear(),cur.getMonth(),cur.getDate()));cur.setDate(cur.getDate()+1);}return keys;}
 function markVacationRange(){const keys=rangeKeys();if(!keys){toast('Elegí fecha desde y hasta');return;}keys.forEach(key=>{const ov=D.shiftDays[key]||{};ov.kind='vacaciones';delete ov.pay;D.shiftDays[key]=ov;});save();renderCal();toast(`${keys.length} día(s) marcados como vacaciones 🟣`);}
 function clearVacationRange(){const keys=rangeKeys();if(!keys){toast('Elegí fecha desde y hasta');return;}let n=0;keys.forEach(key=>{if(D.shiftDays[key]&&dayKind(D.shiftDays[key])==='vacaciones'){delete D.shiftDays[key];n++;}});save();renderCal();toast(`${n} día(s) de vacaciones quitados`);}
-function copyShiftSummary(){const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];const dim=new Date(calY,calM+1,0).getDate();const dows=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];let tur=[],pag=0,hrs=0,hols=[],libres=[],vacs=[];for(let d=1;d<=dim;d++){const info=getDayInfo(calY,calM,d);const dow=dows[new Date(calY,calM,d).getDay()];if(info.turno){tur.push(`• ${dow} ${d}${info.hol?' 🎉':''} ${info.is24?'07-07 (24h)':'15-07 (16h)'} ${info.pay==='P'?'✅ pagado':'⏳ pend'}${info.notes?' — '+info.notes:''}`);if(info.pay==='P')pag++;hrs+=info.hours;}if(info.libre)libres.push(`${dow} ${d}`);if(info.vac)vacs.push(`${dow} ${d}`);if(info.hol)hols.push(`${dow} ${d}`);}let lines=[`📅 *TURNOS ${months[calM].toUpperCase()} ${calY}*`,'',`🔴 Turnos: ${tur.length} · ✅ Pagados: ${pag} · ⏱️ Horas: ${Math.round(hrs)}h`,''];lines=lines.concat(tur.length?tur:['Sin turnos marcados.']);if(libres.length)lines.push('',`🟢 Días libres: ${libres.join(' · ')}`);if(vacs.length)lines.push('',`🟣 Vacaciones (${vacs.length} días): ${vacs.join(' · ')}`);if(hols.length)lines.push('',`🟡 Feriados del mes: ${hols.join(' · ')}`);const txt=lines.join('\n');if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(()=>toast('Resumen copiado')).catch(()=>fbCopy(txt));else fbCopy(txt);}
+function copyShiftSummary(){const months=['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre'];const dim=new Date(calY,calM+1,0).getDate();const dows=['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];let tur=[],hrs=0,hols=[],libres=[],vacs=[];for(let d=1;d<=dim;d++){const info=getDayInfo(calY,calM,d);const dow=dows[new Date(calY,calM,d).getDay()];if(info.turno){tur.push(`• ${dow} ${d}${info.hol?' 🎉':''} ${info.is24?'07-07 (24h)':'15-07 (16h)'}${info.notes?' — '+info.notes:''}`);hrs+=info.hours;}if(info.libre)libres.push(`${dow} ${d}`);if(info.vac)vacs.push(`${dow} ${d}`);if(info.hol)hols.push(`${dow} ${d}`);}let lines=[`📅 *TURNOS ${months[calM].toUpperCase()} ${calY}*`,'',`🔴 Turnos: ${tur.length} · ⏱️ Horas: ${Math.round(hrs)}h`,''];lines=lines.concat(tur.length?tur:['Sin turnos marcados.']);if(libres.length)lines.push('',`🟢 Días libres: ${libres.join(' · ')}`);if(vacs.length)lines.push('',`🟣 Vacaciones (${vacs.length} días): ${vacs.join(' · ')}`);if(hols.length)lines.push('',`🟡 Feriados del mes: ${hols.join(' · ')}`);const txt=lines.join('\n');if(navigator.clipboard&&window.isSecureContext)navigator.clipboard.writeText(txt).then(()=>toast('Resumen copiado')).catch(()=>fbCopy(txt));else fbCopy(txt);}
 function fbCopy(txt){try{const ta=document.createElement('textarea');ta.value=txt;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);toast('Copiado');}catch(e){toast('Copiar manualmente');}}
 
 /* CONFIG CRUD */
@@ -2044,13 +2089,13 @@ function renderManual(){document.getElementById('manualContent').innerHTML=`<div
 <li><b>7 🕐 Contraste y tiempos:</b> aparece para estudios con contraste (ver abajo).</li>
 <li><b>8 Seguridad:</b> canalización, RM, embarazo, consentimiento, nota interna.</li>
 <li><b>Alerta:</b> el semáforo te dice qué falta antes de copiar.</li>
-<li><b>9 WhatsApp:</b> Modelo servicio o Resumen rápido del paciente.</li>
+<li><b>9 WhatsApp:</b> Modelo servicio o Resumen rápido de pacientes (apila varios separados por barras).</li>
 </ul>
 
-<h4>🕐 Contraste y tiempos (lo nuevo)</h4><p>Elegí el <b>tipo de contraste</b> y se despliega lo que corresponde:</p>
+<h4>🕐 Contraste y tiempos (lo nuevo)</h4><p>La sección 7 aparece <b>resaltada en amarillo</b> para estudios con contraste. Solo si vas a registrar los tiempos, marcás <b>"Agregar tiempos de contraste al reporte"</b>: ahí la sección toma el color del tema y se abren los campos. Si la marcás, los tiempos se agregan al <b>modelo servicio</b> y al <b>resumen rápido</b>, y se activan las alertas.</p>
 <ul>
 <li><b>💧 Oral:</b> registrá <b>hora de inicio</b>, si <b>terminó</b> (→ hora fin) o <b>no terminó</b> (→ hora que retiró), y la <b>hora de scan</b> (se calcula sola: inicio +60min, editable). Genera la frase tal como la pide el R+: <i>terminó contraste: inició __, terminó __, se pide __</i>; o si no terminó: <i>retiró contraste __</i>.</li>
-<li><b>💉 Endovenoso:</b> elegí el <b>protocolo</b> (Panscan, renal, suprarrenales, TEP…) y se muestran sus fases. Poné la <b>hora de inyección</b>.</li>
+<li><b>💉 Endovenoso:</b> elegí el <b>protocolo</b> (Panscan, renal, suprarrenales, TEP…) y se muestran sus fases como referencia. Poné la <b>hora de inyección</b>.</li>
 <li><b>⏰ Alertas:</b> el app te avisa con <b>sonido + aviso visual</b> cuando llega la hora del scan (oral) o de cada fase tardía (3/7/10/15 min). Si instalás el app (ver abajo), además intenta mandarte una notificación.</li>
 </ul>
 
@@ -2063,20 +2108,26 @@ function renderManual(){document.getElementById('manualContent').innerHTML=`<div
 <li><b>Frases rápidas</b> tocables para el comentario (más tarde, que coordinen mañana, pendiente creatinina…).</li>
 </ul>
 
-<h4>📲 Resumen codificado de guardia</h4><p>En la bandeja, <b>seleccioná</b> (☑️) los pacientes que querés reportar y tocá <b>"Generar resumen"</b>. Arma el formato exacto que el equipo entiende:</p>
+<h4>📲 Resumen de pacientes (codificado)</h4><p>Tenés dos formas de armarlo:</p>
+<ul>
+<li><b>En la bandeja:</b> <b>seleccioná</b> (☑️) los pacientes y tocá <b>"Generar resumen"</b>.</li>
+<li><b>En el Caso → módulo 9 → "Resumen rápido de pacientes":</b> cada paciente que guardás/compartís se <b>apila en vivo</b>, separado por barras. Se reinicia al copiar, enviar o vaciar.</li>
+</ul>
+<p>El formato es el que el equipo entiende:</p>
 <p style="background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:9px;font-family:monospace;font-size:.74rem;white-space:pre-line">*RESUMEN*
-☢️6608 cirugía | Ma Li
-Eduvijis de Boutat
-8-481-331  68a
-TC AP C x diverticulitis
-* terminó contraste: inició 01:00, terminó 02:00, se pide 03:00
-————- COMENTARIO ————-
-🔊6609 | Bejarano
-Edna Barco
-8-759-1219  44a
-US FID x apendicitis
-* más tarde</p>
-<p>Los que marcaste como <b>Comentario</b> caen en la sección COMENTARIO. <b>Copiá</b> (lo más estable) y pegá en WhatsApp. Códigos de modalidad: ☢️ TC · 🔊 US · 🩻 Rx · 🧲 RM · 🧪 fluoro · 🧬 intervención.</p>
+☢️6629 Obs
+Adolfo Hernández 89a
+2-38-129
+Tc ap contrastado ad diverticulitis
+Camilla
+- retiró contraste 2:55am
+|—————————|
+🔊6622 Tejada
+Rubiela García 69a
+7-72-1913
+USg renal y vesical ad hidronefrosis
+- pedida 4:30am, no llegó</p>
+<p>Los que marcaste como <b>Comentario</b> en la bandeja caen en la sección COMENTARIO. <b>Copiá</b> (lo más estable) y pegá en WhatsApp. Códigos: ☢️ TC · 🔊 US · 🩻 Rx · 🧲 RM · 🧪 fluoro · 🧬 intervención.</p>
 
 <h4>🚦 El semáforo de alerta</h4><div class="lgd"><div><span class="chip" style="background:var(--gbg)">🟢</span><div><b>Listo</b></div></div><div><span class="chip" style="background:var(--ybg)">🟡</span><div><b>Falta no crítica</b></div></div><div><span class="chip" style="background:var(--obg)">🟠</span><div><b>Requiere preparación</b></div></div><div><span class="chip" style="background:var(--rbg)">🔴</span><div><b>Falta crítica</b></div></div><div><span class="chip" style="background:var(--bbg)">⚫</span><div><b>Crítico / coordinar</b></div></div></div>
 <p class="muted" style="margin-top:6px">El app nunca rechaza pacientes — dice "no listo" y qué falta.</p>
@@ -2104,7 +2155,7 @@ US FID x apendicitis
 
 /* LISTENERS */
 ['cServicio','cMedico','cExt','cPaciente','cCedula','cEdad','cSexo','cUbicacion','cApp','cApqx','cAlergia','cTraslado','cHistoria','cExamen','cDescartar','cCanaliz','cRmSafety','cEmbarazo','cPrep','cConsent','cCoag','cOtros','cImagenPrevia'].forEach(id=>{const e=document.getElementById(id);if(e){const fn=()=>{validate();buildCase();if(id==='cSexo'){renderDynReqs();refreshLabSuggestions();}};e.addEventListener('input',fn);e.addEventListener('change',fn);}});
-['cContrastTipo','cOralInicio','cOralEstado','cOralFin','cOralRetiro','cScanHora','cEvProtocolo','cEvHora'].forEach(id=>{const e=document.getElementById(id);if(e){const fn=()=>{if(typeof updateContrastSection==='function')updateContrastSection();buildCase();if((id==='cOralInicio'||id==='cEvHora')&&typeof requestNotif==='function')requestNotif();};e.addEventListener('input',fn);e.addEventListener('change',fn);}});
+['cContrastAdd','cContrastTipo','cOralInicio','cOralEstado','cOralFin','cOralRetiro','cScanHora','cEvProtocolo','cEvHora'].forEach(id=>{const e=document.getElementById(id);if(e){const fn=()=>{if(typeof updateContrastSection==='function')updateContrastSection();buildCase();if((id==='cOralInicio'||id==='cEvHora')&&typeof requestNotif==='function')requestNotif();};e.addEventListener('input',fn);e.addEventListener('change',fn);}});
 function sendToBandeja(){if(!caseHasContent()){toast('Llená el caso primero');return;}autoSaveCase('manual');toast('📝 Enviado al registro / bandeja');goV('vResumenes',2);}
 function subTabResumen(t){document.querySelectorAll('.rsub').forEach(b=>b.classList.toggle('on',b.dataset.sub===t));document.getElementById('rsBandeja').classList.toggle('hidden',t!=='bandeja');document.getElementById('rsInformes').classList.toggle('hidden',t!=='informes');if(t==='bandeja')renderBandeja();else renderSummaryPicker();}
 document.getElementById('stFilter').addEventListener('input',renderStudies);
