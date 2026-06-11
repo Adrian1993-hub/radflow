@@ -121,7 +121,9 @@ body[data-dark="1"] .lab-btn.suggested{color:var(--ink)}
 .out{width:100%;min-height:200px;border:1px solid var(--line);border-radius:12px;padding:13px;font-size:13px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:color-mix(in srgb,var(--bg) 60%,var(--paper));color:var(--ink);line-height:1.55;white-space:pre-wrap;-webkit-user-select:text;user-select:text}
 .copy-hint{font-size:.7rem;color:var(--soft);margin-top:5px;text-align:center}
 .ttabs{display:grid;grid-template-columns:1fr 1fr;gap:5px;margin-bottom:9px}
-@media(max-width:500px){.ttabs{grid-template-columns:1fr}}
+.ttabs-3{grid-template-columns:1fr 1fr 1fr}
+.ttab{white-space:normal;line-height:1.15}
+@media(max-width:500px){.ttabs,.ttabs-3{grid-template-columns:1fr}}
 /* ===== ALERTA / BANNER ===== */
 .alert-banner{position:fixed;top:0;left:0;right:0;z-index:200;background:var(--navy);color:#fff;padding:11px 14px;display:none;align-items:center;justify-content:space-between;gap:10px;box-shadow:0 4px 16px rgba(0,0,0,.3);transform:translateY(-100%);transition:transform .3s;font-size:.84rem}
 .alert-banner.show{display:flex;transform:translateY(0);animation:abpulse 1.6s ease-in-out 3}
@@ -436,10 +438,12 @@ input[type="time"]{box-sizing:border-box;max-width:100%}
   </div>
 
   <div class="card"><h3><span class="n">9</span> WhatsApp</h3>
-    <div class="ttabs">
+    <div class="ttabs ttabs-3">
       <button class="ttab active" data-tpl="service">Modelo servicio</button>
+      <button class="ttab" data-tpl="raw">Sin ruido visual</button>
       <button class="ttab" data-tpl="quick">Resumen rápido de pacientes</button>
     </div>
+    <p class="copy-hint" id="rawHint" style="display:none;text-align:left">📄 Texto plano: sin emojis ni líneas, todos los campos visibles. Pensado para quien batalla con la tecnología.</p>
     <p class="copy-hint" id="quickHint" style="display:none;text-align:left">📲 Cada paciente que guardás/compartís se va apilando acá, separado por barras. Se reinicia al copiar, enviar o vaciar.</p>
     <textarea id="caseOut" class="out" readonly></textarea>
     <p class="copy-hint">📋 <b>Copiar</b> es lo más estable. WhatsApp es opcional. Si falla copiar → "Seleccionar" y mantené presionado.</p>
@@ -1830,7 +1834,7 @@ const VIEWS=['vCaso','vVoz','vResumenes','vTurnos','vConfig','vManual'];
 function goV(vid,idx){VIEWS.forEach(id=>document.getElementById(id).classList.remove('active'));document.getElementById(vid).classList.add('active');document.querySelectorAll('.bnav button').forEach((b,i)=>b.classList.toggle('active',i===idx));window.scrollTo({top:0,behavior:'smooth'});if(vid==='vTurnos')renderCal();if(vid==='vResumenes'&&typeof renderBandeja==='function'){renderBandeja();if(typeof renderSummaryPicker==='function')renderSummaryPicker();}}
 function goMod(m){document.querySelectorAll('.mod').forEach(x=>x.classList.remove('active'));document.getElementById(m).classList.add('active');document.querySelectorAll('.cnav button').forEach(b=>b.classList.toggle('active',b.dataset.mod===m));}
 document.querySelectorAll('.cnav button').forEach(b=>b.onclick=()=>goMod(b.dataset.mod));
-document.querySelectorAll('.ttab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ttab').forEach(x=>x.classList.remove('active'));b.classList.add('active');const q=b.dataset.tpl==='quick';const qh=document.getElementById('quickHint'),bv=document.getElementById('btnVaciarQuick');if(qh)qh.style.display=q?'block':'none';if(bv)bv.style.display=q?'block':'none';buildCase();});
+document.querySelectorAll('.ttab').forEach(b=>b.onclick=()=>{document.querySelectorAll('.ttab').forEach(x=>x.classList.remove('active'));b.classList.add('active');const t=b.dataset.tpl;const qh=document.getElementById('quickHint'),bv=document.getElementById('btnVaciarQuick'),rh=document.getElementById('rawHint');if(qh)qh.style.display=t==='quick'?'block':'none';if(bv)bv.style.display=t==='quick'?'block':'none';if(rh)rh.style.display=t==='raw'?'block':'none';buildCase();});
 document.querySelectorAll('.vm').forEach(b=>b.onclick=()=>{document.querySelectorAll('.vm').forEach(x=>x.classList.remove('active'));b.classList.add('active');show('vmRecBar',b.dataset.m==='dict');});
 
 /* TEMAS */
@@ -1858,7 +1862,8 @@ function renderLabActive(){
   box.innerHTML=h;
 }
 function setLabVal(id,val){labState[id]=val.trim()||'on';updateLabBtn(id);refreshLabSuggestions();buildCase();}
-function labsLine(){const parts=LABS.filter(l=>labState[l.id]&&labState[l.id]!='').map(l=>{const s=labState[l.id];return s==='on'?l.ab:`${l.ab} ${s}${l.unit?' '+l.unit:''}`;});return parts.length?parts.join(', ')+'.':'—';}
+function labsArr(){return LABS.filter(l=>labState[l.id]&&labState[l.id]!='').map(l=>{const s=labState[l.id];return s==='on'?l.ab:`${l.ab} ${s}${l.unit?' '+l.unit:''}`;});}
+function labsLine(){const p=labsArr();return p.length?p.join(', ')+'.':'—';}
 
 /* BUSCADOR ESTUDIOS */
 const searchInput=document.getElementById('cStudySearch');
@@ -1939,15 +1944,38 @@ function pendingLines(){return validate().filter(a=>a.l!=='green').map(a=>({red:
 function fmtMsg(c,studies,labs,pend,st){
   const estudios=studies.length?studies.map(s=>`  • ${s}`).join('\n'):'  (sin estudios)';
   const ct=(typeof caseContrastComment==='function')?caseContrastComment():'';
-  return `SOLICITUD RADIOLÓGICA\n${DIV}\n📞 EXT: ${c.ext||'—'}\n👨‍⚕️ Médico: ${c.doc||'—'}\n🏥 Servicio: ${c.serv||'—'}\n${DIV}\n👤 Paciente: ${c.px||'—'}\n🆔 Cédula: ${c.ced||'—'}\n🎂 Edad: ${c.edad||'—'}${c.sexo?' · '+c.sexo:''}\n📜 APP: ${c.app||'—'}\n🔪 APQX: ${c.apqx||'—'}${c.alergia?'\n⚠️ Alergia: '+c.alergia:'\nAlergia: —'}\n📍 Ubicación: ${c.ub||'—'}\n🚶 Traslado: ${c.traslado||'—'}\n${DIV}\n📋 Historia: ${c.hist||'—'}\n🔬 Examen: ${c.exam||'—'}\n🧪 Labs: ${labs}\n${DIV}\n🎯 Estudio${studies.length>1?'s':''}:\n${estudios}\n❓ Descartar: ${c.desc||'—'}${c.canaliz?'\n💉 Canalización: '+c.canaliz:''}${ct?'\n🕐 Contraste: '+ct:''}${c.consent&&c.consent!=='No aplica'?'\n🖊️ Consentimiento: '+c.consent:''}${c.imgPrev?'\n🖼️ Imagen previa: '+c.imgPrev:''}${c.otros?'\n👥 Otros servicios: '+c.otros:''}\n${DIV}\nESTADO: ${st}\n${pend.length?'PENDIENTES:\n'+pend.join('\n'):'✅ Sin pendientes'}`;
+  return `SOLICITUD RADIOLÓGICA\n${DIV}\n📞 EXT: ${c.ext||'—'}\n👨‍⚕️ Médico: ${c.doc||'—'}\n🏥 Servicio: ${c.serv||'—'}\n${DIV}\n👤 Paciente: ${c.px||'—'}\n🆔 Cédula: ${c.ced||'—'}\n🎂 Edad: ${c.edad||'—'}${c.sexo?' · '+c.sexo:''}\n📜 APP: ${c.app||'—'}\n🔪 APQX: ${c.apqx||'—'}${c.alergia?'\n⚠️ Alergia: '+c.alergia:'\nAlergia: —'}\n📍 Ubicación: ${c.ub||'—'}\n🚶 Traslado: ${c.traslado||'—'}\n${DIV}\n📋 Historia: ${c.hist||'—'}\n🔬 Examen: ${c.exam||'—'}\n🧪 Labs:${(typeof labsArr==='function'&&labsArr().length)?'\n'+labsArr().map(x=>'  • '+x).join('\n'):' '+labs}\n${DIV}\n🎯 Estudio${studies.length>1?'s':''}:\n${estudios}\n❓ Descartar: ${c.desc||'—'}${c.canaliz?'\n💉 Canalización: '+c.canaliz:''}${ct?'\n🕐 Contraste: '+ct:''}${c.consent&&c.consent!=='No aplica'?'\n🖊️ Consentimiento: '+c.consent:''}${c.imgPrev?'\n🖼️ Imagen previa: '+c.imgPrev:''}${c.otros?'\n👥 Otros servicios: '+c.otros:''}\n${DIV}\nESTADO: ${st}\n${pend.length?'PENDIENTES:\n'+pend.join('\n'):'✅ Sin pendientes'}`;
 }
 function buildCase(){
   const c=C(),tpl=document.querySelector('.ttab.active')?.dataset.tpl||'service';
   const studies=cStudies.map(s=>s.name),pend=pendingLines(),st=statusLabel(),labs=labsLine();
   let out='';
   if(tpl==='service')out=fmtMsg(c,studies,labs,pend,st);
+  else if(tpl==='raw')out=fmtRaw(c,studies);
   else out=(typeof buildQuickStack==='function')?buildQuickStack():'';
   sv('caseOut',out);return out;
+}
+/* Formato "sin ruido visual" — raw, sin emojis ni líneas divisorias */
+function fmtRaw(c,studies){
+  const arr=(typeof labsArr==='function')?labsArr():[];
+  return `EXT: ${c.ext||''}${c.doc?' / '+c.doc:''}
+Servicio: ${c.serv||''}
+${c.px||''}
+ID: ${c.ced||''}     edad: ${c.edad||''}
+APP: ${c.app||''}
+APQX: ${c.apqx||''}
+Alergia: ${c.alergia||''}
+Traslado: ${c.traslado||''}
+
+Historia: ${c.hist||''}
+Examen físico: ${c.exam||''}
+Labs:${arr.length?'\n'+arr.join('\n'):''}
+
+Estudio: ${studies.join(', ')}
+Descartar: ${c.desc||''}
+Canalización: ${c.canaliz||''}
+Consentimiento: ${c.consent||''}
+Imagen previa: ${c.imgPrev||''}`;
 }
 
 /* HISTORIAL */
@@ -2089,7 +2117,7 @@ function renderManual(){document.getElementById('manualContent').innerHTML=`<div
 <li><b>7 🕐 Contraste y tiempos:</b> aparece para estudios con contraste (ver abajo).</li>
 <li><b>8 Seguridad:</b> canalización, RM, embarazo, consentimiento, nota interna.</li>
 <li><b>Alerta:</b> el semáforo te dice qué falta antes de copiar.</li>
-<li><b>9 WhatsApp:</b> Modelo servicio o Resumen rápido de pacientes (apila varios separados por barras).</li>
+<li><b>9 WhatsApp:</b> tres formatos — <b>Modelo servicio</b> (con emojis), <b>Sin ruido visual</b> (texto plano para quien batalla con la tecnología) o <b>Resumen rápido de pacientes</b> (apila varios separados por barras).</li>
 </ul>
 
 <h4>🕐 Contraste y tiempos (lo nuevo)</h4><p>La sección 7 aparece <b>resaltada en amarillo</b> para estudios con contraste. Solo si vas a registrar los tiempos, marcás <b>"Agregar tiempos de contraste al reporte"</b>: ahí la sección toma el color del tema y se abren los campos. Si la marcás, los tiempos se agregan al <b>modelo servicio</b> y al <b>resumen rápido</b>, y se activan las alertas.</p>
